@@ -5,8 +5,7 @@ LastChaos launcher programmed in Lua.<br/>
 # Information
 * Define ```-dev``` as launch parameter to be able to use the developer window.
 * Structure of the Folders/Files on the Server should be like this
-```
-youupdatefolder
+°youupdatefolder
   Style1.html
   Style2.html
   Style3.html
@@ -14,7 +13,7 @@ youupdatefolder
     version.txt
     1.zip
     2.zip ETC
-```
+
 * Style 1 and 2 web page sizes 297x339.
 * Style 3 web page size 725x425.
 * __lccnct.dta__ Structure
