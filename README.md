@@ -5,7 +5,7 @@ LastChaos launcher programmed in Lua.<br/>
 # Information
 * Define ```-dev``` as launch parameter to be able to use the developer window.
 * Structure of the Folders/Files on the Server should be like this
-  * yourpdatefolder
+  * lc_updater (The name of this folder must be in the url of the launcher)
     * Style1.html
     * Style2.html
     * Style3.html
