@@ -18,7 +18,7 @@ youupdatefolder
 * Style 1 and 2 web page sizes 297x339.
 * Style 3 web page size 725x425.
 * lccnct.dta Structure
-*Value 1: launcher url. Example: http://127.0.0.1/lc_updater/
+*       Value 1: launcher url. Example: http://127.0.0.1/lc_updater/
 *     Value 2: Nksp launch argument. (EP1: 6574 / EP2: 4022 / EP3: fkzktlfgod!)
 *     Value 3: Enable/Disable multi Client. (true/false)
 *     Value 4: Server name. Example: I'm Idiot 123
