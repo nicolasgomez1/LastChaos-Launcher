@@ -1,4 +1,4 @@
-# LastChaos Launcher <img align="left" src="https://user-images.githubusercontent.com/5092697/136836589-b655f88e-f67e-433d-bc2a-12c0534e05d9.png" width="150px">
+# LastChaos Launcher <img align="left" src="https://user-images.githubusercontent.com/5092697/137706275-5a285a31-a814-4e40-bb2a-b75601ec6fed.png" width="100px">
 
 LastChaos launcher programmed in Lua.<br/>
 
