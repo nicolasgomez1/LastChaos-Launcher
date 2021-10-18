@@ -3,8 +3,17 @@
 LastChaos launcher programmed in Lua.<br/>
 
 # Information
-* define ```-dev``` as launch parameter to be able to use the developer window.
-
+* Fefine ```-dev``` as launch parameter to be able to use the developer window.
+* Structure of the Folders/Files on the Server should be like this
+```
+youupdatefolder
+  Style1.html
+  Style2.html
+  Style3.html
+  patches(The folder must be called patches compulsorily)
+  patches/version.txt
+  patches/1.zip etc
+```
 # Features
 * 3 Skins and 1 Custom page por Devs.
 * Ability to allow or not multi-clients.
