@@ -10,9 +10,9 @@ LastChaos launcher programmed in Lua.<br/>
   * Style2.html
   * Style3.html
   * patches(The folder must be called patches compulsorily)
-   * version.txt
-   * 1.zip
-   * 2.zip ETC
+     * version.txt
+     * 1.zip
+     * 2.zip ETC
 
 * Style 1 and 2 web page sizes 297x339.
 * Style 3 web page size 725x425.
