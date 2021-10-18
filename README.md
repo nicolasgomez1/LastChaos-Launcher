@@ -11,8 +11,9 @@ youupdatefolder
   Style2.html
   Style3.html
   patches(The folder must be called patches compulsorily)
-  patches/version.txt
-  patches/1.zip etc
+    version.txt
+    1.zip
+    2.zip ETC
 ```
 # Features
 * 3 Skins and 1 Custom page por Devs.
