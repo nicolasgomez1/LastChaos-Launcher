@@ -21,7 +21,7 @@ LastChaos launcher programmed in Lua.<br/>
   * Value 1: Launcher URL. Example: http://127.0.0.1/lc_updater/
   * Value 2: Nksp launch argument. (EP1: 6574 / EP2: 4022 / EP3: fkzktlfgod!)
   * Value 3: Enable/Disable multi Client. (true/false)
-  * Value 4: Server name. Example: I'm Idiot 123
+  * Value 4: Server name. Example: MyServerGonnaBeHackedByReza
   * Value 5: Launcher Style. (Style1 / Style2 / Style3)
 
 # Features
