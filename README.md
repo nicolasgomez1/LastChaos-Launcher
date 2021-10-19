@@ -25,7 +25,7 @@ LastChaos launcher programmed in Lua.<br/>
   * Value 5: Launcher Style. (Style1 / Style2 / Style3)
 
 # Features
-* 3 Skins and 1 Custom page por Devs.
+* 3 Skins and 1 Custom page for dev purposes.
 * Ability to allow or not multi-clients.
 * ip.txt File is not required.
 * After downloading all the updates it will check the existence of LC.exe.new and LC.cdd.new if these 2 files exist, a batch file will be created that replaces the old files with the new ones.
