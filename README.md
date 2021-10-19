@@ -19,7 +19,7 @@ LastChaos launcher programmed in Lua.<br/>
 ---
 * __lccnct.dta__ Structure: ```Value1,Value2,Value3,Value4,Value5```
   * Value 1: Launcher URL. Example: http://127.0.0.1/lc_updater/
-  * Value 2: Nksp launch argument. (EP1: 6574 / EP2: 4022 / EP3: fkzktlfgod!)
+  * Value 2: Nksp launch parameter. (EP1: 6574 / EP2: 4022 / EP3: fkzktlfgod!)
   * Value 3: Enable/Disable multi Client. (true/false)
   * Value 4: Server name. Example: MyServerGonnaBeHackedByReza
   * Value 5: Launcher Style. (Style1 / Style2 / Style3)
