@@ -13,9 +13,10 @@ LastChaos launcher programmed in Lua.<br/>
       * version.txt
       * 1.zip
       * 2.zip ETC
-
+--------------------------------------------------------------------------------------
 * Style 1 and 2 web page sizes 297x339.
 * Style 3 web page size 725x425.
+--------------------------------------------------------------------------------------
 * __lccnct.dta__ Structure: ```Value1,Value2,Value3,Value4,Value5```
   * Value 1: Launcher URL. Example: http://127.0.0.1/lc_updater/
   * Value 2: Nksp launch argument. (EP1: 6574 / EP2: 4022 / EP3: fkzktlfgod!)
