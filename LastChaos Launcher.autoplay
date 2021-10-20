@@ -18,7 +18,7 @@
 <Office2007Theme Theme="5"/>
 <WindowStyles>
 <Width>800</Width>
-<Height>700</Height>
+<Height>300</Height>
 <WindowTitle>LastChaos Launcher</WindowTitle>
 <WindowStyle>2</WindowStyle>
 <FillColor>0</FillColor>
@@ -176,15 +176,26 @@ function UpdateStatus(Status)
 		
 		TaskBarList.SetProgressState(TBPF_ERROR);
 		TaskBarList.SetOverlayIcon(IDI_ERROR);
+	else
+		if(PageSkin == "Style1" or PageSkin == "Style2" or PageSkin == "DevScreen" or PageSkin == "StyleCustom")then
+			Paragraph.SetText("UPDATE_STATUS", Status);
+		elseif(PageSkin == "Style3")then
+			Progress.SetText("UPDATE_PROGRESS", Status);
+		end
 	end
 end
 
 function CheckUpdates()
 	local LauncherURL = (DelimitedToTable(LauncherData, ",")[1]);
-	if(HTTP.TestConnection(LauncherURL, 20, 80, nil, nil) == true)then
+	
+	UpdateStatus("Connecting to Server...");
+	if(HTTP.TestConnection(LauncherURL, 5, 80, nil, nil) == true)then
 		Web.LoadURL("Web1", LauncherURL..DelimitedToTable(LauncherData, ",")[5]..".html");
+		
 		local VersionFile = (LauncherURL.."patches/version.txt");
-		if(HTTP.TestConnection(VersionFile, 20, 80, nil, nil) == true)then
+		
+		UpdateStatus("Connecting to Version file...");
+		if(HTTP.TestConnection(VersionFile, 5, 80, nil, nil) == true)then
 			local OnlineVersion = tonumber(SubmitCheckMethod(VersionFile));
 			if(LocalVersion == OnlineVersion)then
 				UpdateStatus("Completed");
@@ -197,26 +208,39 @@ function CheckUpdates()
 						Paragraph.SetText("PatchesRemaining", "Patches Remaining\t: "..PatchesRemaining);
 						PatchesRemaining = (PatchesRemaining-1);
 					end
-					ActualIcon = (1);
-					DownloadCheckMethod(LauncherURL.."patches/"..(LocalVersion+1)..".zip", _SourceFolder.."\\"..(LocalVersion+1)..".zip");
-					local DownloadError = Application.GetLastError();
-					if(DownloadError ~= 0)then
-						UpdateStatus("Error");
-						Dialog.Message("FATAL ERROR", _tblErrorMessages[DownloadError].."\r\nCannot continue, update cancelled.", MB_OK, MB_ICONSTOP, MB_DEFBUTTON1);
-						Application.Exit(0);
-					else
-						ActualIcon = (1);
-						Zip.Extract(_SourceFolder.."\\"..(LocalVersion+1)..".zip", {"*.*"}, _SourceFolder, true, true, "", ZIP_OVERWRITE_ALWAYS, ZipCallback);
-						local ZipError = Application.GetLastError();
-						if(ZipError ~= 0)then
+					
+					local PatchURL			= (LauncherURL.."patches/"..(LocalVersion+1)..".zip");
+					local PathDestination	= (_SourceFolder.."\\"..(LocalVersion+1)..".zip");
+					
+					UpdateStatus("Connecting to update file...");
+					if(HTTP.TestConnection(PatchURL, 5, 80, nil, nil) == true)then
+						DownloadCheckMethod(PatchURL, PathDestination);
+						local DownloadError = Application.GetLastError();
+						if(DownloadError ~= 0 and DownloadError ~= 2508)then
 							UpdateStatus("Error");
-							Dialog.Message("FATAL ERROR", _tblErrorMessages[ZipError].."\r\nCannot continue, update cancelled.", MB_OK, MB_ICONSTOP, MB_DEFBUTTON1);
+							Dialog.Message("FATAL ERROR", _tblErrorMessages[DownloadError].."\r\nCannot continue, update cancelled.", MB_OK, MB_ICONSTOP, MB_DEFBUTTON1);
+							Application.Exit(0);
+						elseif(DownloadError == 2508)then
 							Application.Exit(0);
 						else
-							WriteBRN(LocalVersion+1, _SourceFolder.."\\vtm.brn");
-							File.Delete(_SourceFolder.."\\"..(LocalVersion+1)..".zip", false, false, false, nil);
-							UpdateReady = (true);
+							Zip.Extract(PathDestination, {"*.*"}, _SourceFolder, true, true, "", ZIP_OVERWRITE_ALWAYS, ZipCallback);
+							local ZipError = Application.GetLastError();
+							if(ZipError ~= 0 and ZipError ~= 1027)then
+								UpdateStatus("Error");
+								Dialog.Message("FATAL ERROR", _tblErrorMessages[ZipError].."\r\nCannot continue, update cancelled.", MB_OK, MB_ICONSTOP, MB_DEFBUTTON1);
+								Application.Exit(0);
+							elseif(ZipError == 1027)then
+								Application.Exit(0);
+							else
+								WriteBRN(LocalVersion+1, _SourceFolder.."\\vtm.brn");
+								LocalVersion = (LocalVersion+1);
+								File.Delete(PathDestination, false, false, false, nil);
+								UpdateReady = (true);
+							end
 						end
+					else
+						Dialog.Message("FATAL ERROR", "Unable to connect to Update("..(LocalVersion+1)..") file.\r\nContact an Administrator.", MB_OK, MB_ICONSTOP, MB_DEFBUTTON1);
+						Application.Exit(0);
 					end
 				end
 				
@@ -290,8 +314,13 @@ function Settings()
 	end
 end
 
+function Exit()
+	Cancel = (true);
+	Application.Exit(0);
+end
+
 function ZipCallback(DestinationPath, Percentage, Status)
-	if(Status == ZIP_STATUS_MAJOR)then--GENERAL
+	if(Status == ZIP_STATUS_MAJOR)then
 		if(PageSkin == "StyleCustom")then
 			Image.SetSize("ProgressBar", Percentage*446/100, 15);
 		else
@@ -301,7 +330,7 @@ function ZipCallback(DestinationPath, Percentage, Status)
 		TaskBarList.SetProgressValue(Percentage, 100);
 	end
 	
-	if(Status == ZIP_STATUS_MINOR)then--EACH FILE
+	if(Status == ZIP_STATUS_MINOR)then
 		local Split = String.SplitPath(DestinationPath);
 		if(PageSkin == "Style1" or PageSkin == "Style2" or PageSkin == "StyleCustom")then
 			Paragraph.SetText("UPDATE_STATUS", "Unzipping File : "..Split.Filename..Split.Extension.."  "..Percentage.."%");
@@ -310,6 +339,10 @@ function ZipCallback(DestinationPath, Percentage, Status)
 		elseif(PageSkin == "DevScreen")then
 			Paragraph.SetText("UPDATE_STATUS", "Unzipping File\t:\r\n"..Split.Filename..Split.Extension.."  "..Percentage.."%");
 		end
+	end
+	
+	if(Cancel == true)then
+		return false
 	end
 
 	return true;
@@ -337,6 +370,10 @@ function DownloadCallback(Downloaded, Total, TransferRate, SecondLeft, SecondsLe
 		TaskBarList.SetProgressValue(Percent, 100);
 	end
 	
+	if(Cancel == true)then
+		return false
+	end
+	
 	return true;
 end
 
@@ -349,8 +386,8 @@ function Transparency(Page)
 end</Script>
 <BookMarks count="0">
 </BookMarks>
-<DesignCodeLine>230</DesignCodeLine>
-<DesignCodeCol>42</DesignCodeCol>
+<DesignCodeLine>162</DesignCodeLine>
+<DesignCodeCol>38</DesignCodeCol>
 </Globals>
 <Defaults>
 <StartupPage>_PageFirst</StartupPage>
@@ -411,11 +448,15 @@ end</Script>
 <Script>local TotalLC = (0);
 local TotalNKSP = (0);
 
-if(#_CommandLineArgs &gt; 0)then
-	if(_CommandLineArgs[1] == "-dev")then
+LaunchParameters = (_CommandLineArgs);
+
+if(#LaunchParameters &gt; 0)then
+	if(LaunchParameters[1] == "-dev")then
 		Page.Jump("DevScreen");
 	end
-else
+end
+
+if(LaunchParameters[1] ~= "-dev")then--posible xploit pero ÑE.
 	for PID, Path in pairs(System.EnumerateProcesses()) do
 		if(Path == _SourceFolder.."\\".._SourceFilename)then
 			if(TotalLC &gt;= 1)then
@@ -445,8 +486,8 @@ Page.Jump(DelimitedToTable(LauncherData, ",")[5]);</Script>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
-<DesignCodeLine>0</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
+<DesignCodeLine>35</DesignCodeLine>
+<DesignCodeCol>50</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
@@ -916,7 +957,7 @@ CheckUpdates();</Script>
 </Action>
 </Actions>
 <Text>
-<Body>Connecting To Path Server...</Body>
+<Body>Connecting Patch Server...</Body>
 <NormalColor>8635391</NormalColor>
 <HighlightColor>8635391</HighlightColor>
 <MouseDownColor>8635391</MouseDownColor>
@@ -1219,7 +1260,7 @@ CheckUpdates();</Script>
 <Event>
 <Name>On Click</Name>
 <Args/>
-<Script>Application.Exit(0);</Script>
+<Script>Exit();</Script>
 <TreeStates>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
@@ -2090,7 +2131,7 @@ CheckUpdates();</Script>
 </Action>
 </Actions>
 <Text>
-<Body>Connecting To Path Server...</Body>
+<Body>Connecting Patch Server...</Body>
 <NormalColor>2997247</NormalColor>
 <HighlightColor>2997247</HighlightColor>
 <MouseDownColor>2997247</MouseDownColor>
@@ -2391,14 +2432,14 @@ CheckUpdates();</Script>
 <Event>
 <Name>On Click</Name>
 <Args/>
-<Script>Application.Exit(0);</Script>
+<Script>Exit();</Script>
 <TreeStates>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
 <DesignCodeLine>0</DesignCodeLine>
-<DesignCodeCol>20</DesignCodeCol>
+<DesignCodeCol>7</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
@@ -2511,9 +2552,7 @@ CheckUpdates();</Script>
 <Name>On Preload</Name>
 <Args/>
 <Script>Window.SetSize(Application.GetWndHandle(), 750, 550);
-Window.SetText(Application.GetWndHandle(), ServerName);
-
-Transparency("Style3");</Script>
+Window.SetText(Application.GetWndHandle(), ServerName);</Script>
 <TreeStates>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
@@ -2726,7 +2765,7 @@ CheckUpdates();</Script>
 <BarColor format="hex">a1a269</BarColor>
 <BackgroundColor format="hex">000000</BackgroundColor>
 <TextColor format="hex">ffffff</TextColor>
-<ProgressText>Update Completed!</ProgressText>
+<ProgressText>Connecting Patch Server...</ProgressText>
 <UseCustomColours>1</UseCustomColours>
 </Options>
 <Font>
@@ -3074,14 +3113,14 @@ CheckUpdates();</Script>
 <Event>
 <Name>On Click</Name>
 <Args/>
-<Script>Application.Exit(0);</Script>
+<Script>Exit();</Script>
 <TreeStates>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
 <DesignCodeLine>0</DesignCodeLine>
-<DesignCodeCol>20</DesignCodeCol>
+<DesignCodeCol>7</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
@@ -3182,19 +3221,22 @@ CheckUpdates();</Script>
 <Type>2</Type>
 <ImageStyle>1</ImageStyle>
 <TopColor>16711680</TopColor>
-<BottomColor>16711935</BottomColor>
+<BottomColor>2500134</BottomColor>
 <UseCustomBackgroundSettings>1</UseCustomBackgroundSettings>
 <TransitionEffect/>
 <TransProps/>
 <NormalImage>
-<Filename>AutoPlay\Images\StyleCustom.bmp</Filename>
+<Filename>AutoPlay\Images\StyleCustom.png</Filename>
 </NormalImage>
 </Background>
 <Event>
 <Name>On Preload</Name>
 <Args/>
-<Script>Window.SetSize(Application.GetWndHandle(), 710, 509);
+<Script>Window.SetSize(Application.GetWndHandle(), 710, 706);
 Window.SetText(Application.GetWndHandle(), ServerName);
+
+local wPos = Window.GetPos(Application.GetWndHandle());
+Window.SetPos(Application.GetWndHandle(), wPos.X, wPos.Y-130);
 
 Transparency("StyleCustom");</Script>
 <TreeStates>
@@ -3202,8 +3244,8 @@ Transparency("StyleCustom");</Script>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
-<DesignCodeLine>0</DesignCodeLine>
-<DesignCodeCol>46</DesignCodeCol>
+<DesignCodeLine>4</DesignCodeLine>
+<DesignCodeCol>59</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
@@ -3364,8 +3406,8 @@ CheckUpdates();</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>447</Top>
-<Bottom>476</Bottom>
+<Top>644</Top>
+<Bottom>673</Bottom>
 <Left>34</Left>
 <Right>484</Right>
 </Coordinates>
@@ -3442,7 +3484,7 @@ CheckUpdates();</Script>
 </Action>
 </Actions>
 <Text>
-<Body>Connecting To Path Server...</Body>
+<Body>Connecting Patch Server...</Body>
 <NormalColor>2997247</NormalColor>
 <HighlightColor>2997247</HighlightColor>
 <MouseDownColor>2997247</MouseDownColor>
@@ -3487,8 +3529,8 @@ CheckUpdates();</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>460</Top>
-<Bottom>490</Bottom>
+<Top>657</Top>
+<Bottom>687</Bottom>
 <Left>510</Left>
 <Right>596</Right>
 </Coordinates>
@@ -3609,8 +3651,8 @@ CheckUpdates();</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>460</Top>
-<Bottom>490</Bottom>
+<Top>657</Top>
+<Bottom>687</Bottom>
 <Left>605</Left>
 <Right>691</Right>
 </Coordinates>
@@ -3731,8 +3773,8 @@ CheckUpdates();</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>4</Top>
-<Bottom>20</Bottom>
+<Top>201</Top>
+<Bottom>217</Bottom>
 <Left>690</Left>
 <Right>706</Right>
 </Coordinates>
@@ -3743,14 +3785,14 @@ CheckUpdates();</Script>
 <Event>
 <Name>On Click</Name>
 <Args/>
-<Script>Application.Exit(0);</Script>
+<Script>Exit();</Script>
 <TreeStates>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
 <DesignCodeLine>0</DesignCodeLine>
-<DesignCodeCol>20</DesignCodeCol>
+<DesignCodeCol>7</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
@@ -3853,8 +3895,8 @@ CheckUpdates();</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>66</Top>
-<Bottom>405</Bottom>
+<Top>263</Top>
+<Bottom>602</Bottom>
 <Left>373</Left>
 <Right>670</Right>
 </Coordinates>
@@ -3914,10 +3956,10 @@ CheckUpdates();</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>467</Top>
-<Bottom>482</Bottom>
+<Top>664</Top>
+<Bottom>679</Bottom>
 <Left>36</Left>
-<Right>37</Right>
+<Right>36</Right>
 </Coordinates>
 <Ratios>
 <WidthRatio>-1.000000</WidthRatio>
@@ -4073,30 +4115,30 @@ PageSkin = Application.GetCurrentPage();
 function UpdateList()
 	StatusDlg.Show(MB_ICONNONE, false);
 	local LauncherURL = (DelimitedToTable(LauncherData, ",")[1]);
-	if(HTTP.TestConnection(LauncherURL, 1, 80, nil, nil) == true)then
+	--if(HTTP.TestConnection(LauncherURL, 1, 80, nil, nil) == true)then
 		Web.LoadURL("Web1", LauncherURL..DelimitedToTable(LauncherData, ",")[5]..".html");
 		local VersionFile = (LauncherURL.."patches/version.txt");
-		if(HTTP.TestConnection(VersionFile, 1, 80, nil, nil) == true)then
+		--if(HTTP.TestConnection(VersionFile, 1, 80, nil, nil) == true)then
 			local OnlineVersion = tonumber(SubmitCheckMethod(VersionFile));
 			for UpdateNumber = 1, OnlineVersion do
 				local RowID			= Grid.InsertRow("Grid1", -1, true);
 				local UpdateSize	= (0);
 				local UpdateLink	= (LauncherURL.."patches/"..UpdateNumber..".zip");
 				
-				if(HTTP.TestConnection(UpdateLink, 1, 80, nil, nil) == true)then
+				--if(HTTP.TestConnection(UpdateLink, 1, 80, nil, nil) == true)then
 					UpdateSize = GetUpdateSize(UpdateLink);
-				end
+				--end
 				
 				Grid.SetCellText("Grid1", RowID, 0, UpdateNumber, true);
 				Grid.SetCellText("Grid1", RowID, 1, String.GetFormattedSize(UpdateSize, FMTSIZE_AUTOMATIC, false), true);
 				Grid.SetCellText("Grid1", RowID, 2, UpdateLink, true);
 			end
-		else
-			Dialog.Message("ERROR", "Version file is missing on the Server", MB_OK, MB_ICONSTOP, MB_DEFBUTTON1);
-		end
-	else
-		Dialog.Message("ERROR", "Unable to connect to the Server.", MB_OK, MB_ICONSTOP, MB_DEFBUTTON1);
-	end
+		--else
+		--	Dialog.Message("ERROR", "Version file is missing on the Server", MB_OK, MB_ICONSTOP, MB_DEFBUTTON1);
+		--end
+	--else
+	--	Dialog.Message("ERROR", "Unable to connect to the Server.", MB_OK, MB_ICONSTOP, MB_DEFBUTTON1);
+	--end
 	StatusDlg.Hide();
 end
 
@@ -4106,8 +4148,8 @@ UpdateList();</Script>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
-<DesignCodeLine>55</DesignCodeLine>
-<DesignCodeCol>18</DesignCodeCol>
+<DesignCodeLine>39</DesignCodeLine>
+<DesignCodeCol>21</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
@@ -5887,7 +5929,7 @@ UpdateList();</Script>
 </Action>
 </Actions>
 <Text>
-<Body>Connecting To Path Server...</Body>
+<Body>Connecting Patch Server...</Body>
 <NormalColor>0</NormalColor>
 <HighlightColor>0</HighlightColor>
 <MouseDownColor>0</MouseDownColor>
