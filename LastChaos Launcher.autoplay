@@ -218,7 +218,7 @@ function CheckUpdates()
 						local DownloadError = Application.GetLastError();
 						if(DownloadError ~= 0 and DownloadError ~= 2508)then
 							UpdateStatus("Error");
-							Dialog.Message("FATAL ERROR", _tblErrorMessages[DownloadError].."\r\nCannot continue, update cancelled.", MB_OK, MB_ICONSTOP, MB_DEFBUTTON1);
+							Dialog.Message("FATAL ERROR", _tblErrorMessages[DownloadError].."\r\nCannot continue, update canceled.", MB_OK, MB_ICONSTOP, MB_DEFBUTTON1);
 							Application.Exit(0);
 						elseif(DownloadError == 2508)then
 							Application.Exit(0);
@@ -227,7 +227,7 @@ function CheckUpdates()
 							local ZipError = Application.GetLastError();
 							if(ZipError ~= 0 and ZipError ~= 1027)then
 								UpdateStatus("Error");
-								Dialog.Message("FATAL ERROR", _tblErrorMessages[ZipError].."\r\nCannot continue, update cancelled.", MB_OK, MB_ICONSTOP, MB_DEFBUTTON1);
+								Dialog.Message("FATAL ERROR", _tblErrorMessages[ZipError].."\r\nCannot continue, update canceled.", MB_OK, MB_ICONSTOP, MB_DEFBUTTON1);
 								Application.Exit(0);
 							elseif(ZipError == 1027)then
 								Application.Exit(0);
@@ -313,7 +313,12 @@ function Settings()
 		end
 	end
 end
-
+--NEW BECAUSE CLOSE FROM TASKBAR.
+function QueryAllowProjectClose()
+	Cancel = (true);
+	return true;
+end
+--OLD
 function Exit()
 	Cancel = (true);
 	Application.Exit(0);
@@ -342,7 +347,7 @@ function ZipCallback(DestinationPath, Percentage, Status)
 	end
 	
 	if(Cancel == true)then
-		return false
+		return false;
 	end
 
 	return true;
@@ -371,7 +376,7 @@ function DownloadCallback(Downloaded, Total, TransferRate, SecondLeft, SecondsLe
 	end
 	
 	if(Cancel == true)then
-		return false
+		return false;
 	end
 	
 	return true;
@@ -386,8 +391,8 @@ function Transparency(Page)
 end</Script>
 <BookMarks count="0">
 </BookMarks>
-<DesignCodeLine>162</DesignCodeLine>
-<DesignCodeCol>38</DesignCodeCol>
+<DesignCodeLine>258</DesignCodeLine>
+<DesignCodeCol>21</DesignCodeCol>
 </Globals>
 <Defaults>
 <StartupPage>_PageFirst</StartupPage>
