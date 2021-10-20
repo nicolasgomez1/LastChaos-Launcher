@@ -13,20 +13,21 @@ LastChaos launcher programmed in Lua.<br/>
       * version.txt
       * 1.zip
       * 2.zip ETC
-
+---
 * Style 1 and 2 web page sizes 297x339.
 * Style 3 web page size 725x425.
+---
 * __lccnct.dta__ Structure: ```Value1,Value2,Value3,Value4,Value5```
   * Value 1: Launcher URL. Example: http://127.0.0.1/lc_updater/
-  * Value 2: Nksp launch argument. (EP1: 6574 / EP2: 4022 / EP3: fkzktlfgod!)
+  * Value 2: Nksp launch parameter. (EP1: 6574 / EP2: 4022 / EP3: fkzktlfgod!)
   * Value 3: Enable/Disable multi Client. (true/false)
-  * Value 4: Server name. Example: I'm Idiot 123
+  * Value 4: Server name. Example: MyServerGonnaBeHackedByReza
   * Value 5: Launcher Style. (Style1 / Style2 / Style3)
 
 # Features
-* 3 Skins and 1 Custom page por Devs.
+* 3 Skins and 1 Custom page for dev purposes.
 * Ability to allow or not multi-clients.
-* ip.txt File is not required.
+* ip.txt File is not required anymore.
 * After downloading all the updates it will check the existence of LC.exe.new and LC.cdd.new if these 2 files exist, a batch file will be created that replaces the old files with the new ones.
 
 # Pics
