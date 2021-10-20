@@ -9,7 +9,7 @@ LastChaos launcher programmed in Lua.<br/>
     * Style1.html
     * Style2.html
     * Style3.html
-    * patches(The folder must be called patches compulsorily)
+    * patches(The folder must be called 'patches' compulsorily)
       * version.txt
       * 1.zip
       * 2.zip ETC
