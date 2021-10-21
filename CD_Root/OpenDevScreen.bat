@@ -1,1 +1,1 @@
-start LC.exe -dev
+start autorun.exe -dev

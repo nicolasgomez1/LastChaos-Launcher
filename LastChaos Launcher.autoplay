@@ -63,7 +63,24 @@
 <Tracks/>
 </AudioBGMusic>
 <Globals>
-<Script>require("launcher");
+<Script>--require ("lua5.1");
+package.cpath = _SourceFolder.."\\AutoPlay\\Scripts\\?.dll;"
+
+require("launcher");
+http = require("socket.http");
+socket = require("socket");
+
+function TestConnection(sURL, nTimeout)
+	if nTimeout and type(nTimeout) == "number" then
+		http.TIMEOUT = nTimeout;
+	end
+	local a,b = http.request({url=sURL, method="HEAD"});
+	if a==1 then
+		return true;
+	else
+		return false;
+	end
+end
 
 LocalVersion	= tonumber(ReadBRN(_SourceFolder.."\\vtm.brn"));
 --Table Value 1 = Launcher Url, Value 2 = Nksp launch argument, Value 3 = Enable (false/true) Multi Nksp, Value 4 = Server name, Value 5 = Launcher Style
@@ -134,9 +151,7 @@ function UpdateStatus(Status)
 		else
 			Progress.SetCurrentPos("UPDATE_PROGRESS", 100);
 		end
-		
-		Button.SetEnabled("START", true);
-		
+
 		TaskBarList.SetProgressState(TBPF_NOPROGRESS);
 		TaskBarList.SetOverlayIconFromLoadFile(LR_SHARED, "", 0);
 
@@ -164,6 +179,8 @@ function UpdateStatus(Status)
 			Window.Close(Application.GetWndHandle(), CLOSEWND_TERMINATE);
 		end
 		
+		Button.SetEnabled("START", true);
+		
 		if(Application.LoadValue("LastChaos "..ServerName.." Launcher", "StartGameAfterUpdate") == "true")then
 			LaunchGame();
 		end
@@ -189,14 +206,16 @@ function CheckUpdates()
 	local LauncherURL = (DelimitedToTable(LauncherData, ",")[1]);
 	
 	UpdateStatus("Connecting to Server...");
-	if(HTTP.TestConnection(LauncherURL, 5, 80, nil, nil) == true)then
-		Web.LoadURL("Web1", LauncherURL..DelimitedToTable(LauncherData, ",")[5]..".html");
+	--if(HTTP.TestConnection(LauncherURL, 3, 80, nil, nil) == true)then
+	if(TestConnection(LauncherURL, 3) == true)then
+		Web.LoadURL("Web1", LauncherURL..DelimitedToTable(LauncherData, ",")[5]..".html");-- Try load page without connection test.
 		
-		local VersionFile = (LauncherURL.."patches/version.txt");
+		local VersionFileURL = (LauncherURL.."patches/version.txt");
 		
 		UpdateStatus("Connecting to Version file...");
-		if(HTTP.TestConnection(VersionFile, 5, 80, nil, nil) == true)then
-			local OnlineVersion = tonumber(SubmitCheckMethod(VersionFile));
+		--if(HTTP.TestConnection(VersionFileURL, 3, 80, nil, nil) == true)then
+		if(TestConnection(VersionFileURL, 3) == true)then
+			local OnlineVersion = tonumber(SubmitCheckMethod(VersionFileURL));
 			if(LocalVersion == OnlineVersion)then
 				UpdateStatus("Completed");
 			elseif(LocalVersion &lt; OnlineVersion)then
@@ -204,23 +223,19 @@ function CheckUpdates()
 				local UpdateReady		= (false);
 				
 				for Count = 1, PatchesRemaining do
-					if(PageSkin == "DevScreen")then
-						Paragraph.SetText("PatchesRemaining", "Patches Remaining\t: "..PatchesRemaining);
-						PatchesRemaining = (PatchesRemaining-1);
-					end
-					
 					local PatchURL			= (LauncherURL.."patches/"..(LocalVersion+1)..".zip");
 					local PathDestination	= (_SourceFolder.."\\"..(LocalVersion+1)..".zip");
 					
 					UpdateStatus("Connecting to update file...");
-					if(HTTP.TestConnection(PatchURL, 5, 80, nil, nil) == true)then
+					--if(HTTP.TestConnection(PatchURL, 3, 80, nil, nil) == true)then
+					if(TestConnection(PatchURL, 3) == true)then
 						DownloadCheckMethod(PatchURL, PathDestination);
 						local DownloadError = Application.GetLastError();
-						if(DownloadError ~= 0 and DownloadError ~= 2508)then
+						if(DownloadError ~= 0 and DownloadError ~= 2508 and DownloadError ~= 1027)then
 							UpdateStatus("Error");
 							Dialog.Message("FATAL ERROR", _tblErrorMessages[DownloadError].."\r\nCannot continue, update canceled.", MB_OK, MB_ICONSTOP, MB_DEFBUTTON1);
 							Application.Exit(0);
-						elseif(DownloadError == 2508)then
+						elseif(DownloadError == 2508 or DownloadError == 1027)then
 							Application.Exit(0);
 						else
 							Zip.Extract(PathDestination, {"*.*"}, _SourceFolder, true, true, "", ZIP_OVERWRITE_ALWAYS, ZipCallback);
@@ -276,9 +291,9 @@ function Settings()
 	else
 		tblMenu[1].Checked = (false);
 	end
-	
+
 	tblMenu[2] = ({});
-	tblMenu[2].Text = ("&amp;Start Game after Update");
+	tblMenu[2].Text = ("&amp;Start Game after update complete");
 	tblMenu[2].ID = (2);
 	
 	if(Application.LoadValue("LastChaos "..ServerName.." Launcher", "StartGameAfterUpdate") == "true")then
@@ -313,19 +328,22 @@ function Settings()
 		end
 	end
 end
---NEW BECAUSE CLOSE FROM TASKBAR.
-function QueryAllowProjectClose()
+
+function QueryAllowProjectClose() --NEW BECAUSE CLOSE FROM TASKBAR.
 	Cancel = (true);
 	return true;
 end
---OLD
-function Exit()
-	Cancel = (true);
+
+function Exit() --OLD
 	Application.Exit(0);
 end
 
 function ZipCallback(DestinationPath, Percentage, Status)
 	if(Status == ZIP_STATUS_MAJOR)then
+		if(Cancel == true)then
+			return false;
+		end
+		
 		if(PageSkin == "StyleCustom")then
 			Image.SetSize("ProgressBar", Percentage*446/100, 15);
 		else
@@ -336,6 +354,10 @@ function ZipCallback(DestinationPath, Percentage, Status)
 	end
 	
 	if(Status == ZIP_STATUS_MINOR)then
+		if(Cancel == true)then
+			return false;
+		end
+		
 		local Split = String.SplitPath(DestinationPath);
 		if(PageSkin == "Style1" or PageSkin == "Style2" or PageSkin == "StyleCustom")then
 			Paragraph.SetText("UPDATE_STATUS", "Unzipping File : "..Split.Filename..Split.Extension.."  "..Percentage.."%");
@@ -349,29 +371,30 @@ function ZipCallback(DestinationPath, Percentage, Status)
 	if(Cancel == true)then
 		return false;
 	end
-
+	
 	return true;
 end
 
 function DownloadCallback(Downloaded, Total, TransferRate, SecondLeft, SecondsLeftFormat, Message)
 	if(Message == "")then
 		local Percent = Math.Floor(Downloaded/Total*100);
-		
 		if(PageSkin == "StyleCustom")then
 			Image.SetSize("ProgressBar", Percent*446/100, 15);
 		else
 			Progress.SetCurrentPos("UPDATE_PROGRESS", Percent);
 		end
 		
-		if(PageSkin == "Style1" or PageSkin == "Style2" or PageSkin == "StyleCustom")then
+		if(PageSkin == "Style1" or PageSkin == "Style2")then
 			Paragraph.SetText("UPDATE_STATUS", "Downloading : "..String.GetFormattedSize(Downloaded, FMTSIZE_AUTOMATIC, false).."/"..String.GetFormattedSize(Total, FMTSIZE_AUTOMATIC, false).."  Speed : "..String.GetFormattedSize(TransferRate*1024, FMTSIZE_AUTOMATIC, true).."/s  Time Remaining : "..SecondsLeftFormat);
 		elseif(PageSkin == "Style3")then
 			Progress.SetText("UPDATE_PROGRESS", "Downloading : "..String.GetFormattedSize(Downloaded, FMTSIZE_AUTOMATIC, false).."/"..String.GetFormattedSize(Total, FMTSIZE_AUTOMATIC, false).."  Speed : "..String.GetFormattedSize(TransferRate*1024, FMTSIZE_AUTOMATIC, true).."/s  Time Remaining : "..SecondsLeftFormat);
 		elseif(PageSkin == "DevScreen")then
 			Paragraph.SetText("UPDATE_STATUS", "Downloading\t: "..String.GetFormattedSize(Downloaded, FMTSIZE_AUTOMATIC, false).."/"..String.GetFormattedSize(Total, FMTSIZE_AUTOMATIC, false).."\t"..Percent.."%\r\nSpeed\t\t: "..String.GetFormattedSize(TransferRate*1024, FMTSIZE_AUTOMATIC, true).."/s\r\nTime Remaining\t: "..SecondsLeftFormat);
+		elseif(PageSkin == "StyleCustom")then
+			local StatusFormat = string.format("Updating... %s %%\t\t\t\t%s/%s (%s/s) %s", tostring(Percent), String.GetFormattedSize(Downloaded, FMTSIZE_AUTOMATIC, false), String.GetFormattedSize(Total, FMTSIZE_AUTOMATIC, false), String.GetFormattedSize(TransferRate*1024, FMTSIZE_AUTOMATIC, true), SecondsLeftFormat);
+			Paragraph.SetText("UPDATE_STATUS", StatusFormat); --more elegant?.
 		end
-		
-		TaskBarList.SetProgressState(TBPF_NORMAL);
+
 		TaskBarList.SetProgressValue(Percent, 100);
 	end
 	
@@ -391,8 +414,8 @@ function Transparency(Page)
 end</Script>
 <BookMarks count="0">
 </BookMarks>
-<DesignCodeLine>258</DesignCodeLine>
-<DesignCodeCol>21</DesignCodeCol>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>2</DesignCodeCol>
 </Globals>
 <Defaults>
 <StartupPage>_PageFirst</StartupPage>
@@ -461,7 +484,7 @@ if(#LaunchParameters &gt; 0)then
 	end
 end
 
-if(LaunchParameters[1] ~= "-dev")then--posible xploit pero ÑE.
+if(LaunchParameters[1] ~= "-dev")then--posible xploit but i dont give a fuck.
 	for PID, Path in pairs(System.EnumerateProcesses()) do
 		if(Path == _SourceFolder.."\\".._SourceFilename)then
 			if(TotalLC &gt;= 1)then
@@ -491,8 +514,8 @@ Page.Jump(DelimitedToTable(LauncherData, ",")[5]);</Script>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
-<DesignCodeLine>35</DesignCodeLine>
-<DesignCodeCol>50</DesignCodeCol>
+<DesignCodeLine>14</DesignCodeLine>
+<DesignCodeCol>19</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
@@ -542,7 +565,7 @@ Page.Jump(DelimitedToTable(LauncherData, ",")[5]);</Script>
 <ReplaceIcon>1</ReplaceIcon>
 <IconFilename>AutoPlay\Icons\32x32.ico</IconFilename>
 <ReplaceVersionInfo>1</ReplaceVersionInfo>
-<FileVer1>1</FileVer1>
+<FileVer1>2</FileVer1>
 <FileVer2>0</FileVer2>
 <FileVer3>0</FileVer3>
 <FileVer4>0</FileVer4>
@@ -551,7 +574,7 @@ Page.Jump(DelimitedToTable(LauncherData, ",")[5]);</Script>
 <ProductVer3>0</ProductVer3>
 <ProductVer4>0</ProductVer4>
 <Comments>Created with AutoPlay Media Studio</Comments>
-<Company>NicolasG DevTeam</Company>
+<Company>NicolasG</Company>
 <FileDescription>LastChaos Launcher</FileDescription>
 <LegalCopyright/>
 <LegalTrademarks/>
@@ -3241,7 +3264,7 @@ CheckUpdates();</Script>
 Window.SetText(Application.GetWndHandle(), ServerName);
 
 local wPos = Window.GetPos(Application.GetWndHandle());
-Window.SetPos(Application.GetWndHandle(), wPos.X, wPos.Y-130);
+Window.SetPos(Application.GetWndHandle(), wPos.X, wPos.Y-150);
 
 Transparency("StyleCustom");</Script>
 <TreeStates>
@@ -3249,8 +3272,8 @@ Transparency("StyleCustom");</Script>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
-<DesignCodeLine>4</DesignCodeLine>
-<DesignCodeCol>59</DesignCodeCol>
+<DesignCodeLine>6</DesignCodeLine>
+<DesignCodeCol>28</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
@@ -3266,7 +3289,7 @@ CheckUpdates();</Script>
 <TreeState>0</TreeState>
 </TreeStates>
 <DesignCodeLine>2</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
+<DesignCodeCol>12</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
@@ -4089,17 +4112,7 @@ CheckUpdates();</Script>
 <Event>
 <Name>On Show</Name>
 <Args/>
-<Script>function g_OnGetMinMaxInfo()
-	tbReturn = ({});
-	tbReturn.MinX = (820);
-	tbReturn.MinY = (345);
-	tbReturn.MaxX = (820);
-	tbReturn.MaxY = (800);
-	
-	return tbReturn;
-end
-
-Input.SetText("GameVersion", LocalVersion);
+<Script>Input.SetText("GameVersion", LocalVersion);
 Input.SetText("LauncherData", LauncherData);
 Input.SetText("LoginServerIP", ReadDTA(_SourceFolder.."\\sl.dta"));
 
@@ -4121,29 +4134,36 @@ function UpdateList()
 	StatusDlg.Show(MB_ICONNONE, false);
 	local LauncherURL = (DelimitedToTable(LauncherData, ",")[1]);
 	--if(HTTP.TestConnection(LauncherURL, 1, 80, nil, nil) == true)then
+	if(TestConnection(LauncherURL, 3) == true)then
 		Web.LoadURL("Web1", LauncherURL..DelimitedToTable(LauncherData, ",")[5]..".html");
-		local VersionFile = (LauncherURL.."patches/version.txt");
+		local VersionFileURL = (LauncherURL.."patches/version.txt");
 		--if(HTTP.TestConnection(VersionFile, 1, 80, nil, nil) == true)then
-			local OnlineVersion = tonumber(SubmitCheckMethod(VersionFile));
-			for UpdateNumber = 1, OnlineVersion do
-				local RowID			= Grid.InsertRow("Grid1", -1, true);
-				local UpdateSize	= (0);
-				local UpdateLink	= (LauncherURL.."patches/"..UpdateNumber..".zip");
-				
-				--if(HTTP.TestConnection(UpdateLink, 1, 80, nil, nil) == true)then
-					UpdateSize = GetUpdateSize(UpdateLink);
-				--end
-				
-				Grid.SetCellText("Grid1", RowID, 0, UpdateNumber, true);
-				Grid.SetCellText("Grid1", RowID, 1, String.GetFormattedSize(UpdateSize, FMTSIZE_AUTOMATIC, false), true);
-				Grid.SetCellText("Grid1", RowID, 2, UpdateLink, true);
+		if(TestConnection(VersionFileURL, 3) == true)then
+			local OnlineVersion = tonumber(SubmitCheckMethod(VersionFileURL));
+			if(type(OnlineVersion) == "number")then
+				for UpdateNumber = 1, OnlineVersion do
+					local RowID			= Grid.InsertRow("Grid1", -1, true);
+					local UpdateSize	= (0);
+					local UpdateURL	= (LauncherURL.."patches/"..UpdateNumber..".zip");
+					
+					--if(HTTP.TestConnection(UpdateURL, 1, 80, nil, nil) == true)then
+					if(TestConnection(UpdateURL, 3) == true)then
+						UpdateSize = GetUpdateSize(UpdateURL);
+					end
+					
+					Grid.SetCellText("Grid1", RowID, 0, UpdateNumber, true);
+					Grid.SetCellText("Grid1", RowID, 1, String.GetFormattedSize(UpdateSize, FMTSIZE_AUTOMATIC, false), true);
+					Grid.SetCellText("Grid1", RowID, 2, UpdateURL, true);
+				end
+			else
+				Dialog.Message("ERROR", "Unable to connect to the Server.", MB_OK, MB_ICONSTOP, MB_DEFBUTTON1);
 			end
-		--else
-		--	Dialog.Message("ERROR", "Version file is missing on the Server", MB_OK, MB_ICONSTOP, MB_DEFBUTTON1);
-		--end
-	--else
-	--	Dialog.Message("ERROR", "Unable to connect to the Server.", MB_OK, MB_ICONSTOP, MB_DEFBUTTON1);
-	--end
+		else
+			Dialog.Message("ERROR", "Version file is missing on the Server", MB_OK, MB_ICONSTOP, MB_DEFBUTTON1);
+		end
+	else
+		Dialog.Message("ERROR", "Unable to connect to the Server.", MB_OK, MB_ICONSTOP, MB_DEFBUTTON1);
+	end
 	StatusDlg.Hide();
 end
 
@@ -4153,8 +4173,8 @@ UpdateList();</Script>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
-<DesignCodeLine>39</DesignCodeLine>
-<DesignCodeCol>21</DesignCodeCol>
+<DesignCodeLine>36</DesignCodeLine>
+<DesignCodeCol>42</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
@@ -4302,7 +4322,7 @@ UpdateList();</Script>
 <Top>70</Top>
 <Bottom>91</Bottom>
 <Left>20</Left>
-<Right>111</Right>
+<Right>161</Right>
 </Coordinates>
 <Ratios>
 <WidthRatio>-1.000000</WidthRatio>
@@ -4311,14 +4331,15 @@ UpdateList();</Script>
 <Event>
 <Name>On Click</Name>
 <Args/>
-<Script>WriteBRN(Input.GetText("GameVersion"), _SourceFolder.."\\vtm.brn");</Script>
+<Script>WriteBRN(Input.GetText("GameVersion"), _SourceFolder.."\\vtm.brn");
+Dialog.TimedMessage("Game Version (vtm.brn)", "Saved !", 1000, MB_ICONINFORMATION);</Script>
 <TreeStates>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
-<DesignCodeLine>0</DesignCodeLine>
-<DesignCodeCol>67</DesignCodeCol>
+<DesignCodeLine>1</DesignCodeLine>
+<DesignCodeCol>59</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
@@ -4398,7 +4419,7 @@ UpdateList();</Script>
 <TextAlignment>2</TextAlignment>
 <ImageAlignment>0</ImageAlignment>
 <ImageTextRelation>3</ImageTextRelation>
-<Theme>1</Theme>
+<Theme>6</Theme>
 <Style>0</Style>
 <State>0</State>
 <MouseOverSoundMode>0</MouseOverSoundMode>
@@ -4434,7 +4455,7 @@ UpdateList();</Script>
 <Coordinates>
 <Top>70</Top>
 <Bottom>91</Bottom>
-<Left>300</Left>
+<Left>350</Left>
 <Right>781</Right>
 </Coordinates>
 <Ratios>
@@ -4444,14 +4465,15 @@ UpdateList();</Script>
 <Event>
 <Name>On Click</Name>
 <Args/>
-<Script>WriteDTA(_SourceFolder.."\\lccnct.dta", Input.GetText("LauncherData"));</Script>
+<Script>WriteDTA(_SourceFolder.."\\lccnct.dta", Input.GetText("LauncherData"));
+Dialog.TimedMessage("Launcher Data (lccnct.dta)", "Saved !", 1000, MB_ICONINFORMATION);</Script>
 <TreeStates>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
-<DesignCodeLine>0</DesignCodeLine>
-<DesignCodeCol>71</DesignCodeCol>
+<DesignCodeLine>1</DesignCodeLine>
+<DesignCodeCol>63</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
@@ -4531,7 +4553,7 @@ UpdateList();</Script>
 <TextAlignment>2</TextAlignment>
 <ImageAlignment>0</ImageAlignment>
 <ImageTextRelation>3</ImageTextRelation>
-<Theme>1</Theme>
+<Theme>6</Theme>
 <Style>0</Style>
 <State>0</State>
 <MouseOverSoundMode>0</MouseOverSoundMode>
@@ -4567,8 +4589,8 @@ UpdateList();</Script>
 <Coordinates>
 <Top>70</Top>
 <Bottom>91</Bottom>
-<Left>120</Left>
-<Right>291</Right>
+<Left>170</Left>
+<Right>341</Right>
 </Coordinates>
 <Ratios>
 <WidthRatio>-1.000000</WidthRatio>
@@ -4577,14 +4599,15 @@ UpdateList();</Script>
 <Event>
 <Name>On Click</Name>
 <Args/>
-<Script>WriteDTA(_SourceFolder.."\\sl.dta", Input.GetText("LoginServerIP"));</Script>
+<Script>WriteDTA(_SourceFolder.."\\sl.dta", Input.GetText("LoginServerIP"));
+Dialog.TimedMessage("Login Server IP (sl.dta)", "Saved !", 1000, MB_ICONINFORMATION);</Script>
 <TreeStates>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
-<DesignCodeLine>0</DesignCodeLine>
-<DesignCodeCol>68</DesignCodeCol>
+<DesignCodeLine>1</DesignCodeLine>
+<DesignCodeCol>61</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
@@ -4664,7 +4687,7 @@ UpdateList();</Script>
 <TextAlignment>2</TextAlignment>
 <ImageAlignment>0</ImageAlignment>
 <ImageTextRelation>3</ImageTextRelation>
-<Theme>1</Theme>
+<Theme>6</Theme>
 <Style>0</Style>
 <State>0</State>
 <MouseOverSoundMode>0</MouseOverSoundMode>
@@ -4701,7 +4724,7 @@ UpdateList();</Script>
 <Top>20</Top>
 <Bottom>41</Bottom>
 <Left>20</Left>
-<Right>111</Right>
+<Right>161</Right>
 </Coordinates>
 <Ratios>
 <WidthRatio>-1.000000</WidthRatio>
@@ -4776,7 +4799,7 @@ UpdateList();</Script>
 </Action>
 </Actions>
 <Text>
-<Body>Game Version</Body>
+<Body>Game Version (vtm.brn)</Body>
 <NormalColor>0</NormalColor>
 <HighlightColor>0</HighlightColor>
 <MouseDownColor>0</MouseDownColor>
@@ -4824,7 +4847,7 @@ UpdateList();</Script>
 <Top>40</Top>
 <Bottom>63</Bottom>
 <Left>20</Left>
-<Right>111</Right>
+<Right>161</Right>
 </Coordinates>
 <Ratios>
 <WidthRatio>-1.000000</WidthRatio>
@@ -4919,8 +4942,8 @@ UpdateList();</Script>
 <Coordinates>
 <Top>20</Top>
 <Bottom>51</Bottom>
-<Left>120</Left>
-<Right>291</Right>
+<Left>170</Left>
+<Right>341</Right>
 </Coordinates>
 <Ratios>
 <WidthRatio>-1.000000</WidthRatio>
@@ -4995,7 +5018,7 @@ UpdateList();</Script>
 </Action>
 </Actions>
 <Text>
-<Body>Login Server IP</Body>
+<Body>Login Server IP (sl.dta)</Body>
 <NormalColor>0</NormalColor>
 <HighlightColor>0</HighlightColor>
 <MouseDownColor>0</MouseDownColor>
@@ -5042,8 +5065,8 @@ UpdateList();</Script>
 <Coordinates>
 <Top>40</Top>
 <Bottom>63</Bottom>
-<Left>120</Left>
-<Right>291</Right>
+<Left>170</Left>
+<Right>341</Right>
 </Coordinates>
 <Ratios>
 <WidthRatio>-1.000000</WidthRatio>
@@ -5138,7 +5161,7 @@ UpdateList();</Script>
 <Coordinates>
 <Top>20</Top>
 <Bottom>41</Bottom>
-<Left>300</Left>
+<Left>350</Left>
 <Right>781</Right>
 </Coordinates>
 <Ratios>
@@ -5214,7 +5237,7 @@ UpdateList();</Script>
 </Action>
 </Actions>
 <Text>
-<Body>Launcher Data</Body>
+<Body>Launcher Data (lccnct.dta)</Body>
 <NormalColor>0</NormalColor>
 <HighlightColor>0</HighlightColor>
 <MouseDownColor>0</MouseDownColor>
@@ -5261,7 +5284,7 @@ UpdateList();</Script>
 <Coordinates>
 <Top>40</Top>
 <Bottom>63</Bottom>
-<Left>300</Left>
+<Left>350</Left>
 <Right>781</Right>
 </Coordinates>
 <Ratios>
@@ -5781,7 +5804,7 @@ UpdateList();</Script>
 <AutoResize>10</AutoResize>
 <Coordinates>
 <Top>270</Top>
-<Bottom>289</Bottom>
+<Bottom>291</Bottom>
 <Left>500</Left>
 <Right>791</Right>
 </Coordinates>
@@ -5856,8 +5879,8 @@ UpdateList();</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>10</AutoResize>
 <Coordinates>
-<Top>210</Top>
-<Bottom>271</Bottom>
+<Top>217</Top>
+<Bottom>270</Bottom>
 <Left>500</Left>
 <Right>791</Right>
 </Coordinates>
@@ -5979,8 +6002,8 @@ UpdateList();</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>10</AutoResize>
 <Coordinates>
-<Top>190</Top>
-<Bottom>221</Bottom>
+<Top>140</Top>
+<Bottom>171</Bottom>
 <Left>500</Left>
 <Right>791</Right>
 </Coordinates>
@@ -6089,11 +6112,11 @@ UpdateList();</Script>
 </Object>
 <Object>
 <Type>20</Type>
-<Name>xButton3</Name>
+<Name>StartUpdate</Name>
 <VisibleAtDesignTime>1</VisibleAtDesignTime>
 <VisibleAtRunTime>1</VisibleAtRunTime>
 <Locked>0</Locked>
-<Enabled>1</Enabled>
+<Enabled>0</Enabled>
 <ToolTip/>
 <Cursor>0</Cursor>
 <Group>0</Group>
@@ -6102,8 +6125,8 @@ UpdateList();</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>170</Top>
-<Bottom>191</Bottom>
+<Top>196</Top>
+<Bottom>217</Bottom>
 <Left>500</Left>
 <Right>791</Right>
 </Coordinates>
@@ -6194,14 +6217,14 @@ UpdateList();</Script>
 </Action>
 </Actions>
 <Options>
-<Text>Check for Updates</Text>
+<Text>Start Update</Text>
 <TextColor format="hex">000000</TextColor>
 <EnableMarkup>0</EnableMarkup>
 <ButtonImage/>
 <TextAlignment>2</TextAlignment>
 <ImageAlignment>0</ImageAlignment>
 <ImageTextRelation>3</ImageTextRelation>
-<Theme>1</Theme>
+<Theme>6</Theme>
 <Style>0</Style>
 <State>0</State>
 <MouseOverSoundMode>0</MouseOverSoundMode>
@@ -6220,8 +6243,160 @@ UpdateList();</Script>
 <AntiAlias>1</AntiAlias>
 </FontData>
 </Object>
-<HGuidelines/>
-<VGuidelines/>
+<Object>
+<Type>20</Type>
+<Name>xButton3</Name>
+<VisibleAtDesignTime>1</VisibleAtDesignTime>
+<VisibleAtRunTime>1</VisibleAtRunTime>
+<Locked>0</Locked>
+<Enabled>1</Enabled>
+<ToolTip/>
+<Cursor>0</Cursor>
+<Group>0</Group>
+<MaintainAspectRatio>0</MaintainAspectRatio>
+<Pin>0</Pin>
+<TabIndex>-1</TabIndex>
+<AutoResize>0</AutoResize>
+<Coordinates>
+<Top>120</Top>
+<Bottom>141</Bottom>
+<Left>500</Left>
+<Right>791</Right>
+</Coordinates>
+<Ratios>
+<WidthRatio>-1.000000</WidthRatio>
+<HeightRatio>-1.000000</HeightRatio>
+</Ratios>
+<Event>
+<Name>On Click</Name>
+<Args/>
+<Script>local LauncherURL		= (DelimitedToTable(LauncherData, ",")[1]);
+local VersionFileURL	= (LauncherURL.."patches/version.txt");
+local OnlineVersion		= tonumber(SubmitCheckMethod(VersionFileURL));
+if(LocalVersion &lt; OnlineVersion)then
+	local PatchesRemaining	= (OnlineVersion - LocalVersion);
+	Paragraph.SetText("PatchesRemaining", "Patches Remaining: "..PatchesRemaining);
+	xButton.SetEnabled("StartUpdate", true);
+else
+	Dialog.TimedMessage("Check for Updates", "Local version and Online version match, Client Updated!", 1200, MB_ICONINFORMATION);
+end</Script>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>5</DesignCodeLine>
+<DesignCodeCol>57</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Right-Click</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Enter</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Leave</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Hyperlink</Name>
+<Args>string e_Hyperlink</Args>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Actions>
+<Action>
+<Type>0</Type>
+<Name>None</Name>
+<Exit>0</Exit>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+</Action>
+</Actions>
+<Options>
+<Text>Check for Updates</Text>
+<TextColor format="hex">000000</TextColor>
+<EnableMarkup>0</EnableMarkup>
+<ButtonImage/>
+<TextAlignment>2</TextAlignment>
+<ImageAlignment>0</ImageAlignment>
+<ImageTextRelation>3</ImageTextRelation>
+<Theme>6</Theme>
+<Style>0</Style>
+<State>0</State>
+<MouseOverSoundMode>0</MouseOverSoundMode>
+<MouseOverSound/>
+<MouseClickSoundMode>0</MouseClickSoundMode>
+<MouseClickSound/>
+</Options>
+<FontData>
+<FontName>Segoe UI</FontName>
+<CharacterSet>0</CharacterSet>
+<Height>-12</Height>
+<Weight>400</Weight>
+<Italic>0</Italic>
+<Underline>0</Underline>
+<StrikeOut>0</StrikeOut>
+<AntiAlias>1</AntiAlias>
+</FontData>
+</Object>
+<HGuidelines>
+<Guideline>
+<pt>790</pt>
+<locked>0</locked>
+</Guideline>
+</HGuidelines>
+<VGuidelines>
+<Guideline>
+<pt>290</pt>
+<locked>0</locked>
+</Guideline>
+</VGuidelines>
 </Page>
 <SugDialogs/>
 <MissingTechs>
@@ -6237,7 +6412,7 @@ Please double-click on each item to find out how to install it.</DlgMsg>
 </MissingTechs>
 <ProgramPrefs>
 <OutputFolder>C:\Users\nicoh\Documents\AutoPlay Media Studio 8\Output\LastChaos Launcher</OutputFolder>
-<EXEName>LC.exe</EXEName>
+<EXEName>autorun.exe</EXEName>
 <EnableAutoPlayFeatureBTF>0</EnableAutoPlayFeatureBTF>
 <EnableAutoPlayFeatureCDRW>1</EnableAutoPlayFeatureCDRW>
 <EnableAutoPlayFeatureISO>1</EnableAutoPlayFeatureISO>
@@ -6255,7 +6430,7 @@ Please double-click on each item to find out how to install it.</DlgMsg>
 <BuildType>1</BuildType>
 <DriveLetter/>
 <UsePassword>0</UsePassword>
-<OpenFolder>1</OpenFolder>
+<OpenFolder>0</OpenFolder>
 <ObscureFilenames>1</ObscureFilenames>
 <ObscureDataFolder>Launcher</ObscureDataFolder>
 </ProgramPrefs>
