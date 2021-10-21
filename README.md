@@ -1,7 +1,7 @@
 # LastChaos Launcher <img align="left" src="https://user-images.githubusercontent.com/5092697/137706275-5a285a31-a814-4e40-bb2a-b75601ec6fed.png" width="100px">
 
 LastChaos launcher programmed in Lua.<br/>
-Design with <a href="https://www.indigorose.com/autoplay-media-studio/">Autoplay Media Studio 8.5.3.0</a>
+Developed with <a href="https://www.indigorose.com/autoplay-media-studio/">Autoplay Media Studio 8.5.3.0</a>
 
 # Information
 * Define ```-dev``` as launch parameter to be able to use the developer window.
