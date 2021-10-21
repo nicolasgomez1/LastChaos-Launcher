@@ -6412,7 +6412,7 @@ Please double-click on each item to find out how to install it.</DlgMsg>
 </MissingTechs>
 <ProgramPrefs>
 <OutputFolder>C:\Users\nicoh\Documents\AutoPlay Media Studio 8\Output\LastChaos Launcher</OutputFolder>
-<EXEName>autorun.exe</EXEName>
+<EXEName>LC.exe</EXEName>
 <EnableAutoPlayFeatureBTF>0</EnableAutoPlayFeatureBTF>
 <EnableAutoPlayFeatureCDRW>1</EnableAutoPlayFeatureCDRW>
 <EnableAutoPlayFeatureISO>1</EnableAutoPlayFeatureISO>
@@ -6430,7 +6430,7 @@ Please double-click on each item to find out how to install it.</DlgMsg>
 <BuildType>1</BuildType>
 <DriveLetter/>
 <UsePassword>0</UsePassword>
-<OpenFolder>0</OpenFolder>
+<OpenFolder>1</OpenFolder>
 <ObscureFilenames>1</ObscureFilenames>
 <ObscureDataFolder>Launcher</ObscureDataFolder>
 </ProgramPrefs>
