@@ -63,10 +63,7 @@
 <Tracks/>
 </AudioBGMusic>
 <Globals>
-<Script>--require ("lua5.1");
-package.cpath = _SourceFolder.."\\AutoPlay\\Scripts\\?.dll;"
-
-require("launcher");
+<Script>require("launcher");
 http = require("socket.http");
 socket = require("socket");
 
@@ -112,7 +109,7 @@ function DelimitedToTable(String, Delimiter)
 	return tbl;
 end
 
-ServerName	= (DelimitedToTable(LauncherData, ",")[4]);
+ServerName = (DelimitedToTable(LauncherData, ",")[4]);
 
 function GetUpdateSize(Url)
 	if(String.Left(Url, 5) == "https")then
@@ -208,7 +205,11 @@ function CheckUpdates()
 	UpdateStatus("Connecting to Server...");
 	--if(HTTP.TestConnection(LauncherURL, 3, 80, nil, nil) == true)then
 	if(TestConnection(LauncherURL, 3) == true)then
-		Web.LoadURL("Web1", LauncherURL..DelimitedToTable(LauncherData, ",")[5]..".html");-- Try load page without connection test.
+		if(PageSkin == "StyleCustom")then
+			WKE.LoadURL("Web", LauncherURL..DelimitedToTable(LauncherData, ",")[5]..".html");
+		else
+			Web.LoadURL("Web1", LauncherURL..DelimitedToTable(LauncherData, ",")[5]..".html");-- Try load page without connection test.
+		end
 		
 		local VersionFileURL = (LauncherURL.."patches/version.txt");
 		
@@ -285,7 +286,6 @@ function Settings()
 	tblMenu[1] = ({});
 	tblMenu[1].Text = ("&amp;Run on Startup");
 	tblMenu[1].ID = (1);
-	
 	if(Application.LoadValue("LastChaos "..ServerName.." Launcher", "RunOnStartup") == "true")then
 		tblMenu[1].Checked = (true);
 	else
@@ -295,7 +295,6 @@ function Settings()
 	tblMenu[2] = ({});
 	tblMenu[2].Text = ("&amp;Start Game after update complete");
 	tblMenu[2].ID = (2);
-	
 	if(Application.LoadValue("LastChaos "..ServerName.." Launcher", "StartGameAfterUpdate") == "true")then
 		tblMenu[2].Checked = (true);
 	else
@@ -321,6 +320,7 @@ function Settings()
 			
 			if(tblMenu[Ret].ID == 1)then
 				Application.SaveValue("LastChaos "..ServerName.." Launcher", "RunOnStartup", "false");
+				
 				Shell.DeleteShortcut(Shell.GetFolder(SHF_STARTUP), "LastChaos "..ServerName.." Launcher");
 			elseif(tblMenu[Ret].ID == 2)then
 				Application.SaveValue("LastChaos "..ServerName.." Launcher", "StartGameAfterUpdate", "false");
@@ -415,7 +415,7 @@ end</Script>
 <BookMarks count="0">
 </BookMarks>
 <DesignCodeLine>0</DesignCodeLine>
-<DesignCodeCol>2</DesignCodeCol>
+<DesignCodeCol>0</DesignCodeCol>
 </Globals>
 <Defaults>
 <StartupPage>_PageFirst</StartupPage>
@@ -482,6 +482,11 @@ if(#LaunchParameters &gt; 0)then
 	if(LaunchParameters[1] == "-dev")then
 		Page.Jump("DevScreen");
 	end
+	
+	if(LaunchParameters[1] == "-resetsettings")then
+		Application.SaveValue("LastChaos_"..ServerName.."_Launcher", "RunOnStartup", "false");
+		Application.SaveValue("LastChaos_"..ServerName.."_Launcher", "StartGameAfterUpdate", "false");
+	end
 end
 
 if(LaunchParameters[1] ~= "-dev")then--posible xploit but i dont give a fuck.
@@ -514,8 +519,8 @@ Page.Jump(DelimitedToTable(LauncherData, ",")[5]);</Script>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
-<DesignCodeLine>14</DesignCodeLine>
-<DesignCodeCol>19</DesignCodeCol>
+<DesignCodeLine>10</DesignCodeLine>
+<DesignCodeCol>34</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
@@ -565,7 +570,7 @@ Page.Jump(DelimitedToTable(LauncherData, ",")[5]);</Script>
 <ReplaceIcon>1</ReplaceIcon>
 <IconFilename>AutoPlay\Icons\32x32.ico</IconFilename>
 <ReplaceVersionInfo>1</ReplaceVersionInfo>
-<FileVer1>2</FileVer1>
+<FileVer1>3</FileVer1>
 <FileVer2>0</FileVer2>
 <FileVer3>0</FileVer3>
 <FileVer4>0</FileVer4>
@@ -3249,7 +3254,7 @@ CheckUpdates();</Script>
 <Type>2</Type>
 <ImageStyle>1</ImageStyle>
 <TopColor>16711680</TopColor>
-<BottomColor>2500134</BottomColor>
+<BottomColor>3355443</BottomColor>
 <UseCustomBackgroundSettings>1</UseCustomBackgroundSettings>
 <TransitionEffect/>
 <TransProps/>
@@ -3289,7 +3294,7 @@ CheckUpdates();</Script>
 <TreeState>0</TreeState>
 </TreeStates>
 <DesignCodeLine>2</DesignCodeLine>
-<DesignCodeCol>12</DesignCodeCol>
+<DesignCodeCol>0</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
@@ -3366,14 +3371,16 @@ CheckUpdates();</Script>
 <Event>
 <Name>On Key</Name>
 <Args>number e_Key, table e_Modifiers</Args>
-<Script/>
+<Script>if(e_Key == 116)then
+	WKE.LoadURL("Web", DelimitedToTable(LauncherData, ",")[1]..DelimitedToTable(LauncherData, ",")[5]..".html");
+end</Script>
 <TreeStates>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
 <DesignCodeLine>0</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
+<DesignCodeCol>20</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
@@ -3909,67 +3916,6 @@ CheckUpdates();</Script>
 </BUTTON>
 </Object>
 <Object>
-<Type>6</Type>
-<Name>Web1</Name>
-<VisibleAtDesignTime>1</VisibleAtDesignTime>
-<VisibleAtRunTime>1</VisibleAtRunTime>
-<Locked>0</Locked>
-<Enabled>1</Enabled>
-<ToolTip/>
-<Cursor>0</Cursor>
-<Group>0</Group>
-<MaintainAspectRatio>0</MaintainAspectRatio>
-<Pin>0</Pin>
-<TabIndex>-1</TabIndex>
-<AutoResize>0</AutoResize>
-<Coordinates>
-<Top>263</Top>
-<Bottom>602</Bottom>
-<Left>373</Left>
-<Right>670</Right>
-</Coordinates>
-<Ratios>
-<WidthRatio>-1.000000</WidthRatio>
-<HeightRatio>-1.000000</HeightRatio>
-</Ratios>
-<Event>
-<Name>On Navigate</Name>
-<Args>string e_URL</Args>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>0</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Loaded</Name>
-<Args>string e_URL</Args>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>0</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Actions/>
-<WEB_BROWSER>
-<InitialPage/>
-<AltMode>1</AltMode>
-<AltImage/>
-<ShowBorder>0</ShowBorder>
-<ShowScrollbars>0</ShowScrollbars>
-</WEB_BROWSER>
-</Object>
-<Object>
 <Type>3</Type>
 <Name>ProgressBar</Name>
 <VisibleAtDesignTime>1</VisibleAtDesignTime>
@@ -4069,6 +4015,180 @@ CheckUpdates();</Script>
 <Opacity>100</Opacity>
 <HTMode>0</HTMode>
 </NormalImage>
+<MouseOverSndMode>0</MouseOverSndMode>
+<MouseOverSound/>
+<MouseClickSndMode>0</MouseClickSndMode>
+<MouseClickSound/>
+</Object>
+<Object>
+<Type>40</Type>
+<Name>Web</Name>
+<VisibleAtDesignTime>1</VisibleAtDesignTime>
+<VisibleAtRunTime>1</VisibleAtRunTime>
+<Locked>0</Locked>
+<Enabled>1</Enabled>
+<ToolTip/>
+<Cursor>0</Cursor>
+<Group>0</Group>
+<MaintainAspectRatio>0</MaintainAspectRatio>
+<Pin>0</Pin>
+<TabIndex>-1</TabIndex>
+<AutoResize>0</AutoResize>
+<Coordinates>
+<Top>258</Top>
+<Bottom>608</Bottom>
+<Left>34</Left>
+<Right>674</Right>
+</Coordinates>
+<Ratios>
+<WidthRatio>-1.000000</WidthRatio>
+<HeightRatio>-1.000000</HeightRatio>
+</Ratios>
+<Event>
+<Name>OnPreload</Name>
+<Args/>
+<Script>WKE.LoadURL("Web", "https://html5test.com/");</Script>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>16</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>OnConsole</Name>
+<Args>string e_Message, number e_Level, string e_SourceName, number e_SourceLine, string e_StackTrace</Args>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>OnAlert</Name>
+<Args>string e_Msg</Args>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>OnTitleChanged</Name>
+<Args>string e_Title</Args>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>OnURLChanged</Name>
+<Args>string e_Url</Args>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>OnConfirmBox</Name>
+<Args>string e_Msg, *bool e_Confirm</Args>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>OnPromptBox</Name>
+<Args>string e_Msg, string e_DefaultResult, *string e_Result, *bool e_Cancel</Args>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>OnNavigation</Name>
+<Args>string e_Url, number e_Type, *bool e_Confirm</Args>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>OnDocumentReady</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>OnDownload</Name>
+<Args>string e_Url, *bool e_Confirm</Args>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Actions/>
+<PLUGIN>
+<DLLFile>MiniBlink\MiniBlink.apo</DLLFile>
+<CustomData>I</CustomData>
+</PLUGIN>
 <MouseOverSndMode>0</MouseOverSndMode>
 <MouseOverSound/>
 <MouseClickSndMode>0</MouseClickSndMode>
@@ -6384,6 +6504,129 @@ end</Script>
 <StrikeOut>0</StrikeOut>
 <AntiAlias>1</AntiAlias>
 </FontData>
+</Object>
+<Object>
+<Type>2</Type>
+<Name>Paragraph5</Name>
+<VisibleAtDesignTime>1</VisibleAtDesignTime>
+<VisibleAtRunTime>1</VisibleAtRunTime>
+<Locked>0</Locked>
+<Enabled>1</Enabled>
+<ToolTip/>
+<Cursor>0</Cursor>
+<Group>0</Group>
+<MaintainAspectRatio>0</MaintainAspectRatio>
+<Pin>0</Pin>
+<TabIndex>-1</TabIndex>
+<AutoResize>0</AutoResize>
+<Coordinates>
+<Top>-180</Top>
+<Bottom>-5</Bottom>
+<Left>30</Left>
+<Right>380</Right>
+</Coordinates>
+<Ratios>
+<WidthRatio>-1.000000</WidthRatio>
+<HeightRatio>-1.000000</HeightRatio>
+</Ratios>
+<Event>
+<Name>On Click</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>4079394</DesignCodeLine>
+<DesignCodeCol>2573</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Right-Click</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>4079394</DesignCodeLine>
+<DesignCodeCol>7367936</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Enter</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>3095655</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Leave</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>5857125</DesignCodeLine>
+<DesignCodeCol>277553408</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Actions>
+<Action>
+<Type>0</Type>
+<Name>None</Name>
+<Exit>0</Exit>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+</Action>
+</Actions>
+<Text>
+<Body>Added launch parameter -resetsettings for set false the two settings</Body>
+<NormalColor>0</NormalColor>
+<HighlightColor>0</HighlightColor>
+<MouseDownColor>0</MouseDownColor>
+<DisabledColor>12632256</DisabledColor>
+<BorderColor>0</BorderColor>
+<BackColor>16777215</BackColor>
+<FontData>
+<FontName>Segoe UI</FontName>
+<CharacterSet>0</CharacterSet>
+<Height>-12</Height>
+<Weight>400</Weight>
+<Italic>0</Italic>
+<Underline>0</Underline>
+<StrikeOut>0</StrikeOut>
+<AntiAlias>1</AntiAlias>
+</FontData>
+<Alignment>0</Alignment>
+<TransBG>1</TransBG>
+<VSMode>0</VSMode>
+<HSMode>2</HSMode>
+<SBStyle>1</SBStyle>
+<SBSkin>Windows7</SBSkin>
+<Border>0</Border>
+<MouseOverSndMode>0</MouseOverSndMode>
+<MouseOverSound/>
+<MouseClickSndMode>0</MouseClickSndMode>
+<MouseClickSound/>
+</Text>
 </Object>
 <HGuidelines>
 <Guideline>
