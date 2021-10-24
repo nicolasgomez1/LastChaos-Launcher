@@ -32,6 +32,10 @@ Developed with <a href="https://www.indigorose.com/autoplay-media-studio/">Autop
 * ip.txt File is not required anymore.
 * After downloading all the updates it will check the existence of LC.exe.new and LC.cdd.new if these 2 files exist, a batch file will be created that replaces the old files with the new ones.
 
+# Notes
+
+The '__StyleCustom__' is for testing/development purposes, but in case you want to use it, you have to know that the html related to it must be called '__stylecustom.html__' and its measurements are 619x341.
+
 # Pics
 ![DevScreen](https://user-images.githubusercontent.com/5092697/137717846-18aa6f83-fd6b-494e-9c79-98c1fdf39ef1.png)
 ![Style1](https://user-images.githubusercontent.com/5092697/137717859-16dd0a67-36f3-45c5-ba30-e774fcde3374.png)
