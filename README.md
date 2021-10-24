@@ -40,4 +40,5 @@ The '__StyleCustom__' is for testing/development purposes, but in case you want 
 ![DevScreen](https://user-images.githubusercontent.com/5092697/137717846-18aa6f83-fd6b-494e-9c79-98c1fdf39ef1.png)
 ![Style1](https://user-images.githubusercontent.com/5092697/137717859-16dd0a67-36f3-45c5-ba30-e774fcde3374.png)
 ![Style2](https://user-images.githubusercontent.com/5092697/137717862-100bef2e-8a4b-4382-8db5-f6f9c37860df.png)
-![Style3](https://user-images.githubusercontent.com/5092697/137717870-dfa81aa5-65c0-4b61-8366-391df42d4d40.png)
+![Style3](https://user-images.githubusercontent.com/5092697/138597158-10ce356c-d4cf-4802-ae06-17f3c62be6f8.jpg)
+
