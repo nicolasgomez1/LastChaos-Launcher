@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Launcher</title>
+		<link href="https://fonts.googleapis.com/css?family=MedievalSharp" rel="stylesheet">
+		<style type="text/css">
+			.IrisNewspaper::-webkit-scrollbar{
+				background: transparent;
+				width: 10px;
+			}
+			/*.IrisNewspaper::-webkit-scrollbar-thumb{							NOTE not work fine with little amount of text.
+				background:url('Scrollbar_thumb.png') no-repeat;
+				min-height: 39px;
+				max-height: 39px;
+				box-sizing: content-box;
+			}*/
+			.IrisNewspaper::-webkit-scrollbar-thumb{
+				background-color: #a68e73;
+				border: 1px solid #855A36;
+				border-radius: 3px;
+			}
+		</style>
+	</head>
+	<body style="background-image:url(StyleCustom.jpg); background-repeat: no-repeat; width: 647px; height: 398px; overflow-y: hidden; margin: 0;">
+		<table style="width: 100%; height: 100%;">
+			<tr>
+				<!--Left-->
+				<td valign="top">
+					<iframe src="https://discord.com/widget?id=374599781000937472&theme=dark" width="350" height="390" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"></iframe>
+				</td>
+				<!--Right-->
+				<td>
+					<div style="background-image:url(div_background.png); width: 287px; height: 386px; float: right;">
+						<div style="margin-top: 63px; margin-left: 47px;">
+							<p style="color: #FFBB2D; text-shadow: 2px 2px 4px #000000; font-family: 'MedievalSharp'; font-size: 29px;">Iris Newspaper</p>
+						</div><br/>
+						<div class="IrisNewspaper" style="width: 255px; height: 247px; margin-left: 16px; margin-top: -32px; overflow-y: scroll; font-family: 'MedievalSharp'; font-size: 14px;">
+							<img src="new.gif"> Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.<br/>
+							<img src="hot.gif">	It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+						</div>
+					</div>
+				</td>
+			</tr>
+		</table>
+	</body>
+</html>
