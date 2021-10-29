@@ -45,5 +45,5 @@ Developed with <a href="https://www.indigorose.com/autoplay-media-studio/">Autop
  Style3
  <br/><img src="https://user-images.githubusercontent.com/5092697/139489259-50cf3e21-dcda-42af-9af7-23341e1e9a76.jpg"><br/>
  StyleCustom
- <br/><img src="https://user-images.githubusercontent.com/5092697/139489893-7f9577fc-db55-447d-8359-e0eb658f67cf.png"><br/>
+ <br/><img src="https://user-images.githubusercontent.com/5092697/139492719-44fda316-4a81-4c5a-b983-1b8e964a8c28.png"><br/>
 </p>
