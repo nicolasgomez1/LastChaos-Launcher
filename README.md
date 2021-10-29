@@ -26,7 +26,7 @@ Developed with <a href="https://www.indigorose.com/autoplay-media-studio/">Autop
   * Value 2: Nksp launch parameter. (EP1: 6574 / EP2: 4022 / EP3: fkzktlfgod!)
   * Value 3: Enable/Disable multi Client. (true/false)
   * Value 4: Server name. Example: MyServerGonnaBeHackedByReza
-  * Value 5: Launcher Style. (Style1 / Style2 / Style3)
+  * Value 5: Launcher Style. (Style1 / Style2 / Style3 / StyleCustom / DevScreen)
 
 # Features
 * 4 Skins and 1 Custom page for dev purposes.
