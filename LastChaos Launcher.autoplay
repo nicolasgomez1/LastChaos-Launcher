@@ -28,7 +28,7 @@
 <AlwaysOnTop>0</AlwaysOnTop>
 <Resizable>0</Resizable>
 <MinWidth>632</MinWidth>
-<MinHeight>300</MinHeight>
+<MinHeight>50</MinHeight>
 </WindowOptions>
 <TransparentWindow>
 <TransparentImage/>
@@ -205,11 +205,12 @@ function CheckUpdates()
 	UpdateStatus("Connecting to Server...");
 	--if(HTTP.TestConnection(LauncherURL, 3, 80, nil, nil) == true)then
 	if(TestConnection(LauncherURL, 3) == true)then
-		if(PageSkin == "StyleCustom")then
+		--[[if(PageSkin == "StyleCustom")then
 			WKE.LoadURL("Web", LauncherURL..DelimitedToTable(LauncherData, ",")[5]..".html");
 		else
 			Web.LoadURL("Web1", LauncherURL..DelimitedToTable(LauncherData, ",")[5]..".html");-- Try load page without connection test.
-		end
+		end]]
+		WKE.LoadURL("Web", LauncherURL..DelimitedToTable(LauncherData, ",")[5]..".html");
 		
 		local VersionFileURL = (LauncherURL.."patches/version.txt");
 		
@@ -239,7 +240,8 @@ function CheckUpdates()
 						elseif(DownloadError == 2508 or DownloadError == 1027)then
 							Application.Exit(0);
 						else
-							Zip.Extract(PathDestination, {"*.*"}, _SourceFolder, true, true, "", ZIP_OVERWRITE_ALWAYS, ZipCallback);
+							--Zip.Extract(PathDestination, {"*.*"}, _SourceFolder, true, true, "", ZIP_OVERWRITE_ALWAYS, ZipCallback);--An error occurred when creating the output file.
+							ZipEx.Extract(PathDestination, { "*.*" }, _SourceFolder, "", "ZipCallback");--Release 3 (Hotfix)
 							local ZipError = Application.GetLastError();
 							if(ZipError ~= 0 and ZipError ~= 1027)then
 								UpdateStatus("Error");
@@ -414,15 +416,15 @@ function Transparency(Page)
 end</Script>
 <BookMarks count="0">
 </BookMarks>
-<DesignCodeLine>0</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
+<DesignCodeLine>145</DesignCodeLine>
+<DesignCodeCol>16</DesignCodeCol>
 </Globals>
 <Defaults>
 <StartupPage>_PageFirst</StartupPage>
 <MouseOverSoundDefault>AutoPlay\Audio\High1.ogg</MouseOverSoundDefault>
 <MouseClickSoundDefault>AutoPlay\Audio\Click1.ogg</MouseClickSoundDefault>
 <MemMngMethod>0</MemMngMethod>
-<UserPrivilegeLevel>1</UserPrivilegeLevel>
+<UserPrivilegeLevel>0</UserPrivilegeLevel>
 </Defaults>
 <TargetMedia>
 <TargetMediaSize>4</TargetMediaSize>
@@ -433,6 +435,7 @@ end</Script>
 </Group>
 <ActionPlugins>
 <Plugin>TaskBarList\TaskBarList.lmd</Plugin>
+<Plugin>ZipEx\ZipEx.lmd</Plugin>
 </ActionPlugins>
 <TemplateInfo>
 <Name/>
@@ -570,7 +573,7 @@ Page.Jump(DelimitedToTable(LauncherData, ",")[5]);</Script>
 <ReplaceIcon>1</ReplaceIcon>
 <IconFilename>AutoPlay\Icons\32x32.ico</IconFilename>
 <ReplaceVersionInfo>1</ReplaceVersionInfo>
-<FileVer1>3</FileVer1>
+<FileVer1>5</FileVer1>
 <FileVer2>0</FileVer2>
 <FileVer3>0</FileVer3>
 <FileVer4>0</FileVer4>
@@ -768,14 +771,16 @@ CheckUpdates();</Script>
 <Event>
 <Name>On Key</Name>
 <Args>number e_Key, table e_Modifiers</Args>
-<Script/>
+<Script>if(e_Key == 116)then
+	WKE.LoadURL("Web", DelimitedToTable(LauncherData, ",")[1]..DelimitedToTable(LauncherData, ",")[5]..".html");
+end</Script>
 <TreeStates>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
-<DesignCodeLine>0</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
+<DesignCodeLine>2</DesignCodeLine>
+<DesignCodeCol>3</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
@@ -1569,67 +1574,6 @@ CheckUpdates();</Script>
 </Options>
 </Object>
 <Object>
-<Type>6</Type>
-<Name>Web1</Name>
-<VisibleAtDesignTime>1</VisibleAtDesignTime>
-<VisibleAtRunTime>1</VisibleAtRunTime>
-<Locked>0</Locked>
-<Enabled>1</Enabled>
-<ToolTip/>
-<Cursor>0</Cursor>
-<Group>0</Group>
-<MaintainAspectRatio>0</MaintainAspectRatio>
-<Pin>0</Pin>
-<TabIndex>-1</TabIndex>
-<AutoResize>0</AutoResize>
-<Coordinates>
-<Top>15</Top>
-<Bottom>354</Bottom>
-<Left>388</Left>
-<Right>685</Right>
-</Coordinates>
-<Ratios>
-<WidthRatio>-1.000000</WidthRatio>
-<HeightRatio>-1.000000</HeightRatio>
-</Ratios>
-<Event>
-<Name>On Navigate</Name>
-<Args>string e_URL</Args>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>0</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Loaded</Name>
-<Args>string e_URL</Args>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>0</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Actions/>
-<WEB_BROWSER>
-<InitialPage/>
-<AltMode>1</AltMode>
-<AltImage/>
-<ShowBorder>0</ShowBorder>
-<ShowScrollbars>0</ShowScrollbars>
-</WEB_BROWSER>
-</Object>
-<Object>
 <Type>0</Type>
 <Name>SETTINGS</Name>
 <VisibleAtDesignTime>1</VisibleAtDesignTime>
@@ -1751,6 +1695,180 @@ CheckUpdates();</Script>
 <MouseClickSound/>
 </BUTTON>
 </Object>
+<Object>
+<Type>40</Type>
+<Name>Web</Name>
+<VisibleAtDesignTime>1</VisibleAtDesignTime>
+<VisibleAtRunTime>1</VisibleAtRunTime>
+<Locked>0</Locked>
+<Enabled>1</Enabled>
+<ToolTip/>
+<Cursor>0</Cursor>
+<Group>0</Group>
+<MaintainAspectRatio>0</MaintainAspectRatio>
+<Pin>0</Pin>
+<TabIndex>-1</TabIndex>
+<AutoResize>0</AutoResize>
+<Coordinates>
+<Top>15</Top>
+<Bottom>354</Bottom>
+<Left>388</Left>
+<Right>685</Right>
+</Coordinates>
+<Ratios>
+<WidthRatio>-1.000000</WidthRatio>
+<HeightRatio>-1.000000</HeightRatio>
+</Ratios>
+<Event>
+<Name>OnPreload</Name>
+<Args/>
+<Script>WKE.LoadURL("Web", "https://html5test.com/");</Script>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>16</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>OnConsole</Name>
+<Args>string e_Message, number e_Level, string e_SourceName, number e_SourceLine, string e_StackTrace</Args>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>OnAlert</Name>
+<Args>string e_Msg</Args>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>OnTitleChanged</Name>
+<Args>string e_Title</Args>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>OnURLChanged</Name>
+<Args>string e_Url</Args>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>OnConfirmBox</Name>
+<Args>string e_Msg, *bool e_Confirm</Args>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>OnPromptBox</Name>
+<Args>string e_Msg, string e_DefaultResult, *string e_Result, *bool e_Cancel</Args>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>OnNavigation</Name>
+<Args>string e_Url, number e_Type, *bool e_Confirm</Args>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>OnDocumentReady</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>OnDownload</Name>
+<Args>string e_Url, *bool e_Confirm</Args>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Actions/>
+<PLUGIN>
+<DLLFile>MiniBlink\MiniBlink.apo</DLLFile>
+<CustomData/>
+</PLUGIN>
+<MouseOverSndMode>0</MouseOverSndMode>
+<MouseOverSound/>
+<MouseClickSndMode>0</MouseClickSndMode>
+<MouseClickSound/>
+</Object>
 <HGuidelines/>
 <VGuidelines/>
 </Page>
@@ -1777,9 +1895,7 @@ CheckUpdates();</Script>
 <Args/>
 <Script>Window.SetSize(Application.GetWndHandle(), 734, 670);
 Window.SetText(Application.GetWndHandle(), ServerName);
-
-local wPos = Window.GetPos(Application.GetWndHandle());
-Window.SetPos(Application.GetWndHandle(), wPos.X, wPos.Y-100);
+Window.SetPos(Application.GetWndHandle(), Window.GetPos(Application.GetWndHandle()).X, System.GetDisplayInfo().Height / 2 - Window.GetSize(Application.GetWndHandle()).Height / 2);
 
 Transparency("Style2");</Script>
 <TreeStates>
@@ -1787,8 +1903,8 @@ Transparency("Style2");</Script>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
-<DesignCodeLine>2</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
+<DesignCodeLine>1</DesignCodeLine>
+<DesignCodeCol>55</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
@@ -1881,14 +1997,16 @@ CheckUpdates();</Script>
 <Event>
 <Name>On Key</Name>
 <Args>number e_Key, table e_Modifiers</Args>
-<Script/>
+<Script>if(e_Key == 116)then
+	WKE.LoadURL("Web", DelimitedToTable(LauncherData, ",")[1]..DelimitedToTable(LauncherData, ",")[5]..".html");
+end</Script>
 <TreeStates>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
-<DesignCodeLine>0</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
+<DesignCodeLine>2</DesignCodeLine>
+<DesignCodeCol>3</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
@@ -1934,67 +2052,6 @@ CheckUpdates();</Script>
 <BookMarks count="0">
 </BookMarks>
 </Event>
-<Object>
-<Type>6</Type>
-<Name>Web1</Name>
-<VisibleAtDesignTime>1</VisibleAtDesignTime>
-<VisibleAtRunTime>1</VisibleAtRunTime>
-<Locked>0</Locked>
-<Enabled>1</Enabled>
-<ToolTip/>
-<Cursor>0</Cursor>
-<Group>0</Group>
-<MaintainAspectRatio>0</MaintainAspectRatio>
-<Pin>0</Pin>
-<TabIndex>-1</TabIndex>
-<AutoResize>0</AutoResize>
-<Coordinates>
-<Top>260</Top>
-<Bottom>599</Bottom>
-<Left>399</Left>
-<Right>696</Right>
-</Coordinates>
-<Ratios>
-<WidthRatio>-1.000000</WidthRatio>
-<HeightRatio>-1.000000</HeightRatio>
-</Ratios>
-<Event>
-<Name>On Navigate</Name>
-<Args>string e_URL</Args>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>0</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Loaded</Name>
-<Args>string e_URL</Args>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>0</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Actions/>
-<WEB_BROWSER>
-<InitialPage/>
-<AltMode>1</AltMode>
-<AltImage/>
-<ShowBorder>0</ShowBorder>
-<ShowScrollbars>0</ShowScrollbars>
-</WEB_BROWSER>
-</Object>
 <Object>
 <Type>11</Type>
 <Name>UPDATE_PROGRESS</Name>
@@ -2560,6 +2617,180 @@ CheckUpdates();</Script>
 <MouseClickSound/>
 </BUTTON>
 </Object>
+<Object>
+<Type>40</Type>
+<Name>Web</Name>
+<VisibleAtDesignTime>1</VisibleAtDesignTime>
+<VisibleAtRunTime>1</VisibleAtRunTime>
+<Locked>0</Locked>
+<Enabled>1</Enabled>
+<ToolTip/>
+<Cursor>0</Cursor>
+<Group>0</Group>
+<MaintainAspectRatio>0</MaintainAspectRatio>
+<Pin>0</Pin>
+<TabIndex>-1</TabIndex>
+<AutoResize>0</AutoResize>
+<Coordinates>
+<Top>260</Top>
+<Bottom>599</Bottom>
+<Left>399</Left>
+<Right>696</Right>
+</Coordinates>
+<Ratios>
+<WidthRatio>-1.000000</WidthRatio>
+<HeightRatio>-1.000000</HeightRatio>
+</Ratios>
+<Event>
+<Name>OnPreload</Name>
+<Args/>
+<Script>WKE.LoadURL("Web", "https://html5test.com/");</Script>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>16</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>OnConsole</Name>
+<Args>string e_Message, number e_Level, string e_SourceName, number e_SourceLine, string e_StackTrace</Args>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>OnAlert</Name>
+<Args>string e_Msg</Args>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>OnTitleChanged</Name>
+<Args>string e_Title</Args>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>OnURLChanged</Name>
+<Args>string e_Url</Args>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>OnConfirmBox</Name>
+<Args>string e_Msg, *bool e_Confirm</Args>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>OnPromptBox</Name>
+<Args>string e_Msg, string e_DefaultResult, *string e_Result, *bool e_Cancel</Args>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>OnNavigation</Name>
+<Args>string e_Url, number e_Type, *bool e_Confirm</Args>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>OnDocumentReady</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>OnDownload</Name>
+<Args>string e_Url, *bool e_Confirm</Args>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Actions/>
+<PLUGIN>
+<DLLFile>MiniBlink\MiniBlink.apo</DLLFile>
+<CustomData/>
+</PLUGIN>
+<MouseOverSndMode>0</MouseOverSndMode>
+<MouseOverSound/>
+<MouseClickSndMode>0</MouseClickSndMode>
+<MouseClickSound/>
+</Object>
 <HGuidelines/>
 <VGuidelines/>
 </Page>
@@ -2592,7 +2823,7 @@ Window.SetText(Application.GetWndHandle(), ServerName);</Script>
 <TreeState>0</TreeState>
 </TreeStates>
 <DesignCodeLine>1</DesignCodeLine>
-<DesignCodeCol>55</DesignCodeCol>
+<DesignCodeCol>41</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
@@ -2685,14 +2916,16 @@ CheckUpdates();</Script>
 <Event>
 <Name>On Key</Name>
 <Args>number e_Key, table e_Modifiers</Args>
-<Script/>
+<Script>if(e_Key == 116)then
+	WKE.LoadURL("Web", DelimitedToTable(LauncherData, ",")[1]..DelimitedToTable(LauncherData, ",")[5]..".html");
+end</Script>
 <TreeStates>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
-<DesignCodeLine>0</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
+<DesignCodeLine>2</DesignCodeLine>
+<DesignCodeCol>3</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
@@ -2756,7 +2989,7 @@ CheckUpdates();</Script>
 <Top>494</Top>
 <Bottom>514</Bottom>
 <Left>38</Left>
-<Right>408</Right>
+<Right>400</Right>
 </Coordinates>
 <Ratios>
 <WidthRatio>-1.000000</WidthRatio>
@@ -3059,67 +3292,6 @@ CheckUpdates();</Script>
 </BUTTON>
 </Object>
 <Object>
-<Type>6</Type>
-<Name>Web1</Name>
-<VisibleAtDesignTime>1</VisibleAtDesignTime>
-<VisibleAtRunTime>1</VisibleAtRunTime>
-<Locked>0</Locked>
-<Enabled>1</Enabled>
-<ToolTip/>
-<Cursor>0</Cursor>
-<Group>0</Group>
-<MaintainAspectRatio>0</MaintainAspectRatio>
-<Pin>0</Pin>
-<TabIndex>-1</TabIndex>
-<AutoResize>0</AutoResize>
-<Coordinates>
-<Top>26</Top>
-<Bottom>451</Bottom>
-<Left>12</Left>
-<Right>737</Right>
-</Coordinates>
-<Ratios>
-<WidthRatio>-1.000000</WidthRatio>
-<HeightRatio>-1.000000</HeightRatio>
-</Ratios>
-<Event>
-<Name>On Navigate</Name>
-<Args>string e_URL</Args>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>0</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Loaded</Name>
-<Args>string e_URL</Args>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>0</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Actions/>
-<WEB_BROWSER>
-<InitialPage/>
-<AltMode>1</AltMode>
-<AltImage/>
-<ShowBorder>0</ShowBorder>
-<ShowScrollbars>0</ShowScrollbars>
-</WEB_BROWSER>
-</Object>
-<Object>
 <Type>0</Type>
 <Name>EXIT</Name>
 <VisibleAtDesignTime>1</VisibleAtDesignTime>
@@ -3241,6 +3413,180 @@ CheckUpdates();</Script>
 <MouseClickSound/>
 </BUTTON>
 </Object>
+<Object>
+<Type>40</Type>
+<Name>Web</Name>
+<VisibleAtDesignTime>1</VisibleAtDesignTime>
+<VisibleAtRunTime>1</VisibleAtRunTime>
+<Locked>0</Locked>
+<Enabled>1</Enabled>
+<ToolTip/>
+<Cursor>0</Cursor>
+<Group>0</Group>
+<MaintainAspectRatio>0</MaintainAspectRatio>
+<Pin>0</Pin>
+<TabIndex>-1</TabIndex>
+<AutoResize>0</AutoResize>
+<Coordinates>
+<Top>26</Top>
+<Bottom>451</Bottom>
+<Left>12</Left>
+<Right>737</Right>
+</Coordinates>
+<Ratios>
+<WidthRatio>-1.000000</WidthRatio>
+<HeightRatio>-1.000000</HeightRatio>
+</Ratios>
+<Event>
+<Name>OnPreload</Name>
+<Args/>
+<Script>WKE.LoadURL("Web", "https://html5test.com/");</Script>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>16</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>OnConsole</Name>
+<Args>string e_Message, number e_Level, string e_SourceName, number e_SourceLine, string e_StackTrace</Args>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>OnAlert</Name>
+<Args>string e_Msg</Args>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>OnTitleChanged</Name>
+<Args>string e_Title</Args>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>OnURLChanged</Name>
+<Args>string e_Url</Args>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>OnConfirmBox</Name>
+<Args>string e_Msg, *bool e_Confirm</Args>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>OnPromptBox</Name>
+<Args>string e_Msg, string e_DefaultResult, *string e_Result, *bool e_Cancel</Args>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>OnNavigation</Name>
+<Args>string e_Url, number e_Type, *bool e_Confirm</Args>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>OnDocumentReady</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>OnDownload</Name>
+<Args>string e_Url, *bool e_Confirm</Args>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Actions/>
+<PLUGIN>
+<DLLFile>MiniBlink\MiniBlink.apo</DLLFile>
+<CustomData>u</CustomData>
+</PLUGIN>
+<MouseOverSndMode>0</MouseOverSndMode>
+<MouseOverSound/>
+<MouseClickSndMode>0</MouseClickSndMode>
+<MouseClickSound/>
+</Object>
 <HGuidelines/>
 <VGuidelines/>
 </Page>
@@ -3265,11 +3611,9 @@ CheckUpdates();</Script>
 <Event>
 <Name>On Preload</Name>
 <Args/>
-<Script>Window.SetSize(Application.GetWndHandle(), 710, 706);
+<Script>Window.SetSize(Application.GetWndHandle(), 710, 745);
 Window.SetText(Application.GetWndHandle(), ServerName);
-
-local wPos = Window.GetPos(Application.GetWndHandle());
-Window.SetPos(Application.GetWndHandle(), wPos.X, wPos.Y-150);
+Window.SetPos(Application.GetWndHandle(), Window.GetPos(Application.GetWndHandle()).X, System.GetDisplayInfo().Height / 2 - Window.GetSize(Application.GetWndHandle()).Height / 2);
 
 Transparency("StyleCustom");</Script>
 <TreeStates>
@@ -3277,8 +3621,8 @@ Transparency("StyleCustom");</Script>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
-<DesignCodeLine>6</DesignCodeLine>
-<DesignCodeCol>28</DesignCodeCol>
+<DesignCodeLine>2</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
@@ -3293,7 +3637,7 @@ CheckUpdates();</Script>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
-<DesignCodeLine>2</DesignCodeLine>
+<DesignCodeLine>1</DesignCodeLine>
 <DesignCodeCol>0</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
@@ -3380,7 +3724,7 @@ end</Script>
 <TreeState>0</TreeState>
 </TreeStates>
 <DesignCodeLine>0</DesignCodeLine>
-<DesignCodeCol>20</DesignCodeCol>
+<DesignCodeCol>0</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
@@ -3441,8 +3785,8 @@ end</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>644</Top>
-<Bottom>673</Bottom>
+<Top>684</Top>
+<Bottom>713</Bottom>
 <Left>34</Left>
 <Right>484</Right>
 </Coordinates>
@@ -3564,8 +3908,8 @@ end</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>657</Top>
-<Bottom>687</Bottom>
+<Top>697</Top>
+<Bottom>727</Bottom>
 <Left>510</Left>
 <Right>596</Right>
 </Coordinates>
@@ -3686,8 +4030,8 @@ end</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>657</Top>
-<Bottom>687</Bottom>
+<Top>697</Top>
+<Bottom>727</Bottom>
 <Left>605</Left>
 <Right>691</Right>
 </Coordinates>
@@ -3930,10 +4274,10 @@ end</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>664</Top>
-<Bottom>679</Bottom>
+<Top>704</Top>
+<Bottom>719</Bottom>
 <Left>36</Left>
-<Right>36</Right>
+<Right>37</Right>
 </Coordinates>
 <Ratios>
 <WidthRatio>-1.000000</WidthRatio>
@@ -4035,10 +4379,10 @@ end</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>258</Top>
-<Bottom>608</Bottom>
-<Left>34</Left>
-<Right>674</Right>
+<Top>254</Top>
+<Bottom>652</Bottom>
+<Left>31</Left>
+<Right>678</Right>
 </Coordinates>
 <Ratios>
 <WidthRatio>-1.000000</WidthRatio>
@@ -4187,7 +4531,7 @@ end</Script>
 <Actions/>
 <PLUGIN>
 <DLLFile>MiniBlink\MiniBlink.apo</DLLFile>
-<CustomData>i</CustomData>
+<CustomData>þþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþÿÿÿÿÿÿÿÿÿÿÿÿþþþÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþþÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿþþþþþþÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿ</CustomData>
 </PLUGIN>
 <MouseOverSndMode>0</MouseOverSndMode>
 <MouseOverSound/>
@@ -5576,7 +5920,7 @@ Dialog.TimedMessage("Login Server IP (sl.dta)", "Saved !", 1000, MB_ICONINFORMAT
 </Action>
 </Actions>
 <Text>
-<Body>Update List</Body>
+<Body>Patches List</Body>
 <NormalColor>0</NormalColor>
 <HighlightColor>0</HighlightColor>
 <MouseDownColor>0</MouseDownColor>
