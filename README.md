@@ -3,6 +3,12 @@
 LastChaos launcher programmed in Lua.<br/>
 Developed with <a href="https://www.indigorose.com/autoplay-media-studio/">Autoplay Media Studio 8.5.3.0</a>
 
+# Features
+* 4 Skins and 1 Custom page for dev purposes.
+* Ability to allow or not multi-clients.
+* ip.txt File is not required anymore.
+* After downloading all the updates it will check the existence of LC.exe.new and LC.cdd.new if these 2 files exist, a batch file will be created that replaces the old files with the new ones.
+* 
 # Information
 * Define ```-dev``` as launch parameter to be able to use the developer window.
 * Define ```-resetsettings``` as launch parameter to reset the configuration.
@@ -27,12 +33,6 @@ Developed with <a href="https://www.indigorose.com/autoplay-media-studio/">Autop
   * Value 3: Enable/Disable multi Client. (true/false)
   * Value 4: Server name. Example: MyServerGonnaBeHackedByReza
   * Value 5: Launcher Style. (Style1 / Style2 / Style3 / StyleCustom / DevScreen)
-
-# Features
-* 4 Skins and 1 Custom page for dev purposes.
-* Ability to allow or not multi-clients.
-* ip.txt File is not required anymore.
-* After downloading all the updates it will check the existence of LC.exe.new and LC.cdd.new if these 2 files exist, a batch file will be created that replaces the old files with the new ones.
 
 # Pics
 <p align="center">
