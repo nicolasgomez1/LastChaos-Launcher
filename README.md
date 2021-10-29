@@ -8,7 +8,7 @@ Developed with <a href="https://www.indigorose.com/autoplay-media-studio/">Autop
 * Ability to allow or not multi-clients.
 * ip.txt File is not required anymore.
 * After downloading all the updates it will check the existence of LC.exe.new and LC.cdd.new if these 2 files exist, a batch file will be created that replaces the old files with the new ones.
-* 
+
 # Information
 * Define ```-dev``` as launch parameter to be able to use the developer window.
 * Define ```-resetsettings``` as launch parameter to reset the configuration.
