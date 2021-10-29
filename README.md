@@ -35,8 +35,15 @@ Developed with <a href="https://www.indigorose.com/autoplay-media-studio/">Autop
 * After downloading all the updates it will check the existence of LC.exe.new and LC.cdd.new if these 2 files exist, a batch file will be created that replaces the old files with the new ones.
 
 # Pics
-![DevScreen](https://user-images.githubusercontent.com/5092697/139489251-488bb2c8-21be-4112-b217-8602386cfb46.jpg)
-![Style1](https://user-images.githubusercontent.com/5092697/139489253-07000c9f-967f-4839-8c53-55890a560521.jpg)
-![Style2](https://user-images.githubusercontent.com/5092697/139490209-c1779f92-dab8-4507-8325-318c537c1450.png)
-![Style3](https://user-images.githubusercontent.com/5092697/139489259-50cf3e21-dcda-42af-9af7-23341e1e9a76.jpg)
-![StyleCustom](https://user-images.githubusercontent.com/5092697/139489893-7f9577fc-db55-447d-8359-e0eb658f67cf.png)
+<p align="center">
+ DevScreen
+ <br/><img src="https://user-images.githubusercontent.com/5092697/139489251-488bb2c8-21be-4112-b217-8602386cfb46.jpg"><br/>
+ Style1
+ <br/><img src="https://user-images.githubusercontent.com/5092697/139489253-07000c9f-967f-4839-8c53-55890a560521.jpg"><br/>
+ Style2
+ <br/><img src="https://user-images.githubusercontent.com/5092697/139490209-c1779f92-dab8-4507-8325-318c537c1450.png"><br/>
+ Style3
+ <br/><img src="https://user-images.githubusercontent.com/5092697/139489259-50cf3e21-dcda-42af-9af7-23341e1e9a76.jpg"><br/>
+ StyleCustom
+ <br/><img src="https://user-images.githubusercontent.com/5092697/139489893-7f9577fc-db55-447d-8359-e0eb658f67cf.png"><br/>
+</p>
