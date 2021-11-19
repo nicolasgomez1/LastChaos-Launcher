@@ -4,40 +4,51 @@ LastChaos launcher programmed in Lua.<br/>
 Developed with <a href="https://www.indigorose.com/autoplay-media-studio/">Autoplay Media Studio 8.5.3.0</a>
 
 # Features
-* 4 Skins and 1 Custom page for dev purposes.
-* Ability to allow or not multi-clients.
-* ip.txt File is not required anymore.
-* After downloading all the updates it will check the existence of LC.exe.new and LC.cdd.new if these 2 files exist, a batch file will be created that replaces the old files with the new ones.
+1) 4 Skins, 3 Originals & 1 Custom.
+2) Allow or Not Multi Client.
+3) Pause & Resume Update Downloads.
+4) Repair Game Files.
+5) Window dedicated for Developers.
+6) MiniBlink(WKE Version) for Web browser.
+7) Little Settings Menu with 2 Functions: Run game after applying updates & Start launcher at windows startup.
+8) Dedicated button to install dependencies (VCRedist C ++ 2010 & DirectX 9.0c).
 
-# Information
-* Define ```-dev``` as launch parameter to be able to use the developer window.
-* Define ```-resetsettings``` as launch parameter to reset the configuration.
-* Structure of the Folders/Files on the Server should be like this
-  * lc_updater (The name of this folder must be in the url of the launcher)
-    * style1.html
-    * style2.html
-    * style3.html
-    * stylecustom.html
-    * __patches(This folder must be called 'patches' compulsorily!)__
-      * version.txt
-      * 1.zip
-      * 2.zip ETC
----
-* Style 1 and 2 Web page sizes 297x339.
-* Style 3 Web page size 725x425.
-* Custom Style Web page size 647x398.
----
-* __lccnct.dta__ Structure: ```Value1,Value2,Value3,Value4,Value5```
-  * Value 1: Launcher URL. Example: http://127.0.0.1/lc_updater/
-  * Value 2: Nksp launch parameter. (EP1: 6574 / EP2: 4022 / EP3: fkzktlfgod!)
-  * Value 3: Enable/Disable multi Client. (true/false)
-  * Value 4: Server name. Example: MyServerGonnaBeHackedByReza
-  * Value 5: Launcher Style. (Style1 / Style2 / Style3 / StyleCustom / DevScreen)
+# Available Launch Commands/Arguments
+* ```-dev``` (Desc: Open Launcher on Developer mode)
+* ```-resetsettings``` (Desc: Reset "Run On Startup" and "StartGameAfterUpdate")
+* ```-installdependencies``` (Desc: Force installation of "VCRedist C++ 2010" and "DirectX 9.0c")
+* ```-createlist="<path>"``` (Desc: Create File Check List Without Window) (Example -createlist="C:\MyClientFolder")
+   Note: Note that it will not exclude any files, you will have to remove all the files from the launcher yourself (This will change in later versions)
+
+# Folder Structure on Server
+	Host
+	└──Updater Folder (Example: lc_updater)
+	   ├───patches Folder (It is mandatory that the folder should be called patcher)
+	   │   ├───version.txt File
+	   │   └───Patches files here
+	   ├───client Folder (It is mandatory that the folder should be called client)
+	   │   ├───checklist.txt File
+	   │   └───Entire Client here
+	   ├───style1.html
+	   ├───style2.html
+	   ├───style3.html
+	   └───style4.html
+
+# Information / Notes
+1) Style 1, 2 & 3 Web Browser Size: 297 Width 339 Height.
+2) Style 3 Web Browser Size: 725 Width 425 Height.
+3) Style 4 Web Browser Size: 647 Width 398 Height.
+4) Nksp Launch Parameter: EP1: 6574 / EP2: 4022 / EP3 & Up: fkzktlfgod!
+5) To update the Launcher, it is as simple as taking the new EXE and CDD and renaming them as LC.exe.new and LC.cdd.new and adding them to the updates, after downloading the updates, the existence of these files will be checked in the folder of the game client, if it exists, a .bat process will be created and the old files will be replaced by the new ones.
+6) Unfortunately I am using a function that is included with the IDE itself to obtain the Checksum (CRC32) so I don't have much control, I don't know which tables are used. What I can comment on is that it does not seem to fail. It is capable of distinguishing bytes in lowercase or uppercase. In case the file is empty, it returns 0 as checksum.
+7) The Save button of Game Version and that of the Launcher Settings section serve to refresh the list of patches.
+8) Game files verification Process takes 52 seconds (47781 Files) (Sys: FX 6300, HDD 7200rpm, Windows 10).
+9) the content of the file __lccnct.dta__ differs slightly from the content of the previous versions, so this launcher is not compatible with the file of the old version (Now called __legacy__).
 
 # Pics
 <p align="center">
  DevScreen
- <br/><img src="https://user-images.githubusercontent.com/5092697/139489251-488bb2c8-21be-4112-b217-8602386cfb46.jpg"><br/>
+ <br/><img src="https://user-images.githubusercontent.com/5092697/142677740-f0e575f6-21ea-4911-bf6b-5f494cd4f4ae.jpg"><br/>
  Style1
  <br/><img src="https://user-images.githubusercontent.com/5092697/139489253-07000c9f-967f-4839-8c53-55890a560521.jpg"><br/>
  Style2
@@ -47,3 +58,6 @@ Developed with <a href="https://www.indigorose.com/autoplay-media-studio/">Autop
  StyleCustom
  <br/><img src="https://user-images.githubusercontent.com/5092697/139492719-44fda316-4a81-4c5a-b983-1b8e964a8c28.png"><br/>
 </p>
+### Finally thanks to [Joker](https://lckb.dev/forum/index.php?/profile/21747-joker/), [Desarija](https://lckb.dev/forum/index.php?/profile/18894-desarija/), [dethunter12](https://lckb.dev/forum/index.php?/profile/2167-dethunter12/)  & [Scura](https://lckb.dev/forum/index.php?/profile/21802-scura/) For helping to Fix / Improve and Complete this application^^.
+
+### Special thanks to [Pabloko ](https://amsspecialist.com/memberlist.php?mode=viewprofile&u=54)for the MiniBlink fork.
