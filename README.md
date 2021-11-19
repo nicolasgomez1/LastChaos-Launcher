@@ -18,7 +18,6 @@ Developed with <a href="https://www.indigorose.com/autoplay-media-studio/">Autop
 * ```-resetsettings``` (Desc: Reset "Run On Startup" and "StartGameAfterUpdate")
 * ```-installdependencies``` (Desc: Force installation of "VCRedist C++ 2010" and "DirectX 9.0c")
 * ```-createlist="<path>"``` (Desc: Create File Check List Without Window) (Example -createlist="C:\MyClientFolder")
-   Note: Note that it will not exclude any files, you will have to remove all the files from the launcher yourself (This will change in later versions)
 
 # Folder Structure on Server
 	Host
@@ -44,6 +43,7 @@ Developed with <a href="https://www.indigorose.com/autoplay-media-studio/">Autop
 7) The Save button of Game Version and that of the Launcher Settings section serve to refresh the list of patches.
 8) Game files verification Process takes 52 seconds (47781 Files) (Sys: FX 6300, HDD 7200rpm, Windows 10).
 9) the content of the file __lccnct.dta__ differs slightly from the content of the previous versions, so this launcher is not compatible with the file of the old version (Now called __legacy__).
+10) Remember to remove the Files you don't want to check from the file list. (checklist.txt)
 
 # Pics
 <p align="center">
