@@ -54,7 +54,7 @@ Developed with <a href="https://www.indigorose.com/autoplay-media-studio/">Autop
  Style2
  <br/><img src="https://user-images.githubusercontent.com/5092697/139490209-c1779f92-dab8-4507-8325-318c537c1450.png"><br/>
  Style3
- <br/><img src="https://user-images.githubusercontent.com/5092697/139489259-50cf3e21-dcda-42af-9af7-23341e1e9a76.jpg"><br/>
+ <br/><img src="https://user-images.githubusercontent.com/5092697/142678571-a169887b-0d9a-4acf-8dd8-5136a085a983.jpg"><br/>
  StyleCustom
  <br/><img src="https://user-images.githubusercontent.com/5092697/139492719-44fda316-4a81-4c5a-b983-1b8e964a8c28.png"><br/>
 </p>
