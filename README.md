@@ -58,6 +58,7 @@ Developed with <a href="https://www.indigorose.com/autoplay-media-studio/">Autop
  StyleCustom
  <br/><img src="https://user-images.githubusercontent.com/5092697/139492719-44fda316-4a81-4c5a-b983-1b8e964a8c28.png"><br/>
 </p>
+
 ### Finally thanks to [Joker](https://lckb.dev/forum/index.php?/profile/21747-joker/), [Desarija](https://lckb.dev/forum/index.php?/profile/18894-desarija/), [dethunter12](https://lckb.dev/forum/index.php?/profile/2167-dethunter12/)  & [Scura](https://lckb.dev/forum/index.php?/profile/21802-scura/) For helping to Fix / Improve and Complete this application^^.
 
 ### Special thanks to [Pabloko ](https://amsspecialist.com/memberlist.php?mode=viewprofile&u=54)for the MiniBlink fork.
