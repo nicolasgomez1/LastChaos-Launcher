@@ -7,7 +7,7 @@ Developed with <a href="https://www.indigorose.com/autoplay-media-studio/">Autop
 1) 4 Skins, 3 Originals & 1 Custom.
 2) Allow or Not Multi Client.
 3) Pause & Resume Update Downloads.
-4) Repair Game Files.
+4) Repair Game Files Function.
 5) Window dedicated for Developers.
 6) MiniBlink(WKE Version) for Web browser.
 7) Little Settings Menu with 2 Functions: Run game after applying updates & Start launcher at windows startup.
