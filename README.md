@@ -11,7 +11,7 @@ Developed with <a href="https://www.indigorose.com/autoplay-media-studio/">Autop
 5) Window dedicated for Developers.
 6) MiniBlink(WKE Version) for Web browser.
 7) Little Settings Menu with 2 Functions: Run game after applying updates & Start launcher at windows startup.
-8) Dedicated button to install dependencies (VCRedist C ++ 2010 & DirectX 9.0c).
+8) Dedicated 'button' to install dependencies (VCRedist C ++ 2010 & DirectX 9.0c).
 
 # Available Launch Commands/Arguments
 * ```-dev``` (Desc: Open Launcher on Developer mode)
