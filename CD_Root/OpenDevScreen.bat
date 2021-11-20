@@ -1,1 +1,0 @@
-start LC.exe -dev

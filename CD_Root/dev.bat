@@ -1,0 +1,1 @@
+start LC.exe -dev -resetsettings
