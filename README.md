@@ -44,6 +44,7 @@ Developed with <a href="https://www.indigorose.com/autoplay-media-studio/">Autop
 8) Game files verification Process takes 52 seconds (47781 Files) (Sys: FX 6300, HDD 7200rpm, Windows 10).
 9) the content of the file __lccnct.dta__ differs slightly from the content of the previous versions, so this launcher is not compatible with the file of the old version (Now called __legacy__).
 10) Remember to remove the Files you don't want to check from the file list. (checklist.txt)
+11) Now the total remaining bytes to download are shown, the weight of each update is not shown individually but all the remaining ones together.
 
 # Pics
 <p align="center">
