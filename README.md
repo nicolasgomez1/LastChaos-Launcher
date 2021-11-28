@@ -9,7 +9,7 @@ Developed with <a href="https://www.indigorose.com/autoplay-media-studio/">Autop
 3) Pause & Resume Update Downloads.
 4) Repair Game Files Function.
 5) Window dedicated for Developers.
-6) MiniBlink(WKE Version) for Web browser.
+6) <a href="https://github.com/weolar/miniblink49/releases">MiniBlink(WKE)</a> for Web browser.
 7) Little Settings Menu with 2 Functions: Run game after applying updates & Start launcher at windows startup.
 8) Dedicated 'button' to install dependencies (VCRedist C++ 2010 & DirectX 9.0c).
 
