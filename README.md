@@ -3,6 +3,8 @@
 Custom LastChaos launcher programmed in Lua.<br/>
 Developed with <a href="https://www.indigorose.com/autoplay-media-studio/">Autoplay Media Studio 8.5.3.0</a>
 
+# Usage guide
+
 # Features
 1) 4 Skins, 3 Originals & Custom one.
 2) Allow or Not Multi Client.
