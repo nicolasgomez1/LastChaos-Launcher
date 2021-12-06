@@ -14,13 +14,17 @@ Developed with <a href="https://www.indigorose.com/autoplay-media-studio/">Autop
 6) <a href="https://github.com/weolar/miniblink49/releases">MiniBlink(WKE)</a> for Web browser.
 7) Little Settings Menu with 2 Functions: Run game after applying updates & start Launcher at Windows startup.
 8) Dedicated 'button' to install dependencies (VCRedist C++ 2010 & DirectX 9.0c).
-9) Command system using the url. (Available commands: `#discord_join=` & `#open=`)
+9) Command system using the url.
 
 # Available Launch Commands/Arguments
 * ```-dev``` (Desc: Open Launcher on Developer mode)
 * ```-resetsettings``` (Desc: Reset "Run On Startup" and "StartGameAfterUpdate")
 * ```-installdependencies``` (Desc: Force installation of "VCRedist C++ 2010" and "DirectX 9.0c")
 * ```-createlist="<path>"``` (Desc: Create File Check List Without Window) (Example: -createlist="C:\MyClientFolder")
+
+# Available Web Commands
+* `#discord_join=` (Desc: Open invite discord) (Example: `<a href="#discord_join=EnVFnY7PVb">Join Discord</a>`)
+* `#open=` (Desc: Open url on default web browser) (Example: `<a href="#open=www.html5test.com">My Link</a>`)
 
 # Folder Structure on Server
 	Host
