@@ -20,11 +20,11 @@ Developed with <a href="https://www.indigorose.com/autoplay-media-studio/">Autop
 * ```-dev``` (Desc: Open Launcher on Developer mode)
 * ```-resetsettings``` (Desc: Reset "Run On Startup" and "StartGameAfterUpdate")
 * ```-installdependencies``` (Desc: Force installation of "VCRedist C++ 2010" and "DirectX 9.0c")
-* ```-createlist="<path>"``` (Desc: Create File Check List Without Window) (Example: `-createlist="C:\MyClientFolder"`)
+* ```-createlist="<path>"``` (Desc: Create File Check List Without Window) (Example:`-createlist="C:\MyClientFolder"`)
 
 # Available Web Commands.
-* `#discord_join=` (Desc: Open a invite for Discord) (Example: `<a href="#discord_join=EnVFnY7PVb">Join Discord</a>`)
-* `#open=` (Desc: Open url on default web browser) (Example: `<a href="#open=www.html5test.com">My Link</a>`)
+* `#discord_join=` (Desc: Open a invite for Discord) (Example:`<a href="#discord_join=EnVFnY7PVb">Join Discord</a>`)
+* `#open=` (Desc: Open url on default web browser) (Example:`<a href="#open=www.html5test.com">My Link</a>`)
 
 # Folder Structure on Server
 	Host
