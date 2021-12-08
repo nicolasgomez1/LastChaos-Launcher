@@ -4,7 +4,7 @@ Custom LastChaos launcher programmed in Lua.<br/>
 Developed with <a href="https://www.indigorose.com/autoplay-media-studio/">Autoplay Media Studio 8.5.3.0</a>
 
 # Usage guide
-1) To create the file checklist.txt you must run the launcher in developer mode. Then you must press the Create Verification File List button, Select the game client folder, and start the process, then simply pose the file checklist.txt resulting in your server folder.(Example: www\lc_updater\client) (the folder must be called client and must be in the same folder where your patch folder is located)
+* __To create the file checklist.txt__ you must run the launcher in developer mode. Then you must press the Create Verification File List button, Select the game client folder, and start the process, then simply pose the file checklist.txt resulting in your server folder.(Example: www\lc_updater\client) (the folder must be called client and must be in the same folder where your patch folder is located)
 # Features
 1) 4 Skins, 3 Originals & Custom one.
 2) Allow or Not Multi Client.
