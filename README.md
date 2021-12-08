@@ -6,7 +6,7 @@ Developed with <a href="https://www.indigorose.com/autoplay-media-studio/">Autop
 # Usage guide
 * __To create the file checklist.txt__ you must run the launcher in developer mode. Then you must press the Create Verification File List button, Select the game client folder, and start the process, then simply pose the file checklist.txt resulting in your server folder.(Example: www\lc_updater\client) (the folder must be called client and must be in the same folder where your patch folder is located)
 # Features
-1) 4 Skins, 3 Originals & Custom one.
+1) 4 Skins. (3 Originals & Custom one)
 2) Allow or Not Multi Client.
 3) Pause & Resume Update Downloads.
 4) Repair Game Files Function.
