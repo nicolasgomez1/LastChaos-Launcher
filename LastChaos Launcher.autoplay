@@ -17,8 +17,8 @@
 <ProjectInfo ToolTipStyle="0">
 <Office2007Theme Theme="5"/>
 <WindowStyles>
-<Width>600</Width>
-<Height>480</Height>
+<Width>750</Width>
+<Height>550</Height>
 <WindowTitle>LastChaos Launcher</WindowTitle>
 <WindowStyle>2</WindowStyle>
 <FillColor>0</FillColor>
@@ -27,7 +27,7 @@
 <Movable>1</Movable>
 <AlwaysOnTop>0</AlwaysOnTop>
 <Resizable>0</Resizable>
-<MinWidth>600</MinWidth>
+<MinWidth>100</MinWidth>
 <MinHeight>429</MinHeight>
 </WindowOptions>
 <TransparentWindow>
@@ -98,43 +98,78 @@ function Settings()
 	end
 	
 	tblMenu[3] = ({});
-	tblMenu[3].Text = ("---");
+	tblMenu[3].Text = ("Game Resolution");
+	tblMenu[3].SubMenu = ({});
+	
+	if(File.DoesExist(_SourceFolder.."\\Data\\Etc\\Setting.ini"))then
+		local GetRes = ("");
+		if(File.DoesExist(_SourceFolder.."\\Data\\Etc\\DisplaySize.txt"))then
+			GetRes = TextFile.ReadToString(_SourceFolder.."\\Data\\Etc\\DisplaySize.txt");	
+		end
+		
+		for _, sName in pairs(INIFile.GetSectionNames(_SourceFolder.."\\Data\\Etc\\Setting.ini")) do
+			if(String.Left(sName, 4) == "GAP_")then
+				local Display = System.GetDisplayInfo();
+				local Sizes = ({});
+				
+				for Size in string.gmatch(String.Replace(String.Replace(sName, "GAP_", "", true), "_", " ", true), "[^%s]+") do
+					table.insert(Sizes, Size);
+				end
+				
+				if(Display.Width &gt; tonumber(Sizes[1]) or Display.Height &gt; tonumber(Sizes[2]))then
+					tblMenu[3].SubMenu[_] = ({});
+					tblMenu[3].SubMenu[_].Text = (String.Replace(String.Replace(sName, "GAP_", "", true), "_", " x ", true));
+					tblMenu[3].SubMenu[_].ID = (_+4);
+					if(GetRes == String.Replace(String.Replace(sName, "GAP_", "", true), "_", " ", true))then
+						tblMenu[3].SubMenu[_].Checked = (true);
+					else
+						tblMenu[3].SubMenu[_].Checked = (false);
+					end
+				end
+			end
+		end
+	end
 	
 	tblMenu[4] = ({});
-	tblMenu[4].Text = ("&amp;Install Dependencies");
-	tblMenu[4].ID = (3);
-	tblMenu[4].Enabled = (Tools);
+	tblMenu[4].Text = ("---");
+	
+	tblMenu[5] = ({});
+	tblMenu[5].Text = ("&amp;Install Dependencies");
+	tblMenu[5].ID = (3);
+	tblMenu[5].Enabled = (Tools);
 	
 	if(AllowRepairFunction == "true")then
-		tblMenu[5] = ({});
-		tblMenu[5].Text = ("&amp;Verify Integrity of Game Files");
-		tblMenu[5].ID = (4);
-		tblMenu[5].Enabled = (Tools);
+		tblMenu[6] = ({});
+		tblMenu[6].Text = ("&amp;Verify Integrity of Game Files");
+		tblMenu[6].ID = (4);
+		tblMenu[6].Enabled = (Tools);
 	end
 	
 	local Pos = System.GetMousePosition(true, Application.GetWndHandle());
 	local Ret = Application.ShowPopupMenu(Pos.X, Pos.Y, tblMenu, TPM_CENTERALIGN, TPM_BOTTOMALIGN, true, true);
 	
 	if(Ret ~= 0)then
-		if(tblMenu[Ret].Checked == false)then
-			tblMenu[Ret].Checked = (true);
-			
-			if(tblMenu[Ret].ID == 1)then
-				Application.SaveValue("LastChaos "..ServerName.." Launcher", "RunOnStartup", "true");
+		if(Ret == 1 or Ret == 2)then
+			if(tblMenu[Ret].Checked == false)then
+				tblMenu[Ret].Checked = (true);
 				
-				Shell.CreateShortcut(Shell.GetFolder(SHF_STARTUP), "LastChaos "..ServerName.." Launcher", _SourceFolder.."\\".._SourceFilename, "", "", "", 0, SW_SHOWNORMAL, nil, "Launcher", START_OPTION_NO_PIN);
-			elseif(tblMenu[Ret].ID == 2)then
-				Application.SaveValue("LastChaos "..ServerName.." Launcher", "StartGameAfterUpdate", "true");
-			end
-		elseif(tblMenu[Ret].Checked == true)then
-			tblMenu[Ret].Checked = (false);
-			
-			if(tblMenu[Ret].ID == 1)then
-				Application.SaveValue("LastChaos "..ServerName.." Launcher", "RunOnStartup", "false");
+				if(tblMenu[Ret].ID == 1)then
+					Application.SaveValue("LastChaos "..ServerName.." Launcher", "RunOnStartup", "true");
+					
+					Shell.CreateShortcut(Shell.GetFolder(SHF_STARTUP), "LastChaos "..ServerName.." Launcher", _SourceFolder.."\\".._SourceFilename, "", "", "", 0, SW_SHOWNORMAL, nil, "Launcher", START_OPTION_NO_PIN);
+				elseif(tblMenu[Ret].ID == 2)then
+					Application.SaveValue("LastChaos "..ServerName.." Launcher", "StartGameAfterUpdate", "true");
+				end
+			elseif(tblMenu[Ret].Checked == true)then
+				tblMenu[Ret].Checked = (false);
 				
-				Shell.DeleteShortcut(Shell.GetFolder(SHF_STARTUP), "LastChaos "..ServerName.." Launcher");
-			elseif(tblMenu[Ret].ID == 2)then
-				Application.SaveValue("LastChaos "..ServerName.." Launcher", "StartGameAfterUpdate", "false");
+				if(tblMenu[Ret].ID == 1)then
+					Application.SaveValue("LastChaos "..ServerName.." Launcher", "RunOnStartup", "false");
+					
+					Shell.DeleteShortcut(Shell.GetFolder(SHF_STARTUP), "LastChaos "..ServerName.." Launcher");
+				elseif(tblMenu[Ret].ID == 2)then
+					Application.SaveValue("LastChaos "..ServerName.." Launcher", "StartGameAfterUpdate", "false");
+				end
 			end
 		end
 		
@@ -167,6 +202,10 @@ function Settings()
 				ChangeStatus("Error", "Unable to connect to check list file.\r\nCheck your Internet connection or contact an administrator.\r\nCannot continue, update canceled.", false);
 				StatusDlg.Hide();
 			end
+		end
+		
+		if(Ret &gt; 4)then
+			TextFile.WriteFromString(_SourceFolder.."\\Data\\Etc\\DisplaySize.txt", String.Replace(tblMenu[3].SubMenu[Ret-4].Text, " x ", " ", true), false);
 		end
 	end
 end
@@ -289,21 +328,20 @@ function Repair()
 	
 	function ErrorDetected(FilePath)
 		DetectedErrors = (DetectedErrors+1);
-		
-		local FileUrl = (HostIP.."client/"..String.Replace(FilePath, "\\", "/", true));
+		local FileUrl  = (HostIP.."client/"..String.Replace(FilePath, "\\", "/", true));
 		
 		local Ret, ReturnCode, Header = http.request({url=FileUrl, method="HEAD"});
 		if(ReturnCode == 200)then
 			PatchFilePath = (_SourceFolder.."\\"..FilePath);
-			Download.Start(Application.GetWndHandle(), FileUrl, _SourceFolder.."\\"..FilePath, "", "", false, nil, -1, 0, 0);
+			--Download.Start(Application.GetWndHandle(), FileUrl, _SourceFolder.."\\"..FilePath, "", "", false, nil, -1, 0, 0);--#OLD
+			Download.Start(Application.GetWndHandle(), FileUrl, _SourceFolder.."\\"..FilePath, "", "", false, nil, -1, Header["content-length"], 0);--################ FIX DATE 1/1/2022: correcto muestreo de peso restante a descargar por el sistema de reparacion
 		else
 			ChangeStatus("Error", "Unable to connect to file\r\nCheck your Internet connection or contact an administrator.\r\nCannot continue, update canceled.", true);
 		end
 	end
 	
 	StatusDlg.SetMessage("Opening File List...");
-	local FileList = TextFile.ReadToString(_SourceFolder.."\\checklist.txt");
-	
+	local FileList			= TextFile.ReadToString(_SourceFolder.."\\checklist.txt");
 	local TotalFilesToScann = select(2, string.gsub(FileList.."\n", "(.-)\r?\n", ""));
 	local TotalFilesScanned = (0);
 	
@@ -457,7 +495,7 @@ function ZipCallback(FilePath, Percentage, Status)
 		
 		TaskBarList.SetProgressValue(Percentage, 100);
 	else
-		Application.Sleep(.05);
+		Application.Sleep(0.01);
 
 		if(Application.GetCurrentPage() == "style1" or Application.GetCurrentPage() == "style2" or Application.GetCurrentPage() == "style4" or Application.GetCurrentPage() == "devscreen")then
 			Paragraph.SetText("Status", UnzipPercent.."% Completed | Unzipping File: "..FilePath.." ("..Percentage.."%)");
@@ -511,6 +549,8 @@ function Download.OnComplete(tblData)
 			
 			if(Application.GetCurrentPage() == "devscreen")then
 				Input.SetText("GameVersion", LocalVersion);
+			elseif(Application.GetCurrentPage() == "style5")then
+				Paragraph.SetText("GameVersion", "Game Version: "..LocalVersion);
 			end
 			
 			File.Delete(PatchFilePath, false, false, false, nil);
@@ -584,8 +624,8 @@ function Transparency()
 end</Script>
 <BookMarks count="0">
 </BookMarks>
-<DesignCodeLine>12</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
+<DesignCodeLine>271</DesignCodeLine>
+<DesignCodeCol>157</DesignCodeCol>
 </Globals>
 <Defaults>
 <StartupPage>_PageFirst</StartupPage>
@@ -599,7 +639,7 @@ end</Script>
 <CustomSize>0</CustomSize>
 </TargetMedia>
 <Group>
-<CurrentGrounp>6</CurrentGrounp>
+<CurrentGrounp>8</CurrentGrounp>
 </Group>
 <ActionPlugins>
 <Plugin>Download\Download.lmd</Plugin>
@@ -712,8 +752,8 @@ end</Script>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
-<DesignCodeLine>11</DesignCodeLine>
-<DesignCodeCol>36</DesignCodeCol>
+<DesignCodeLine>45</DesignCodeLine>
+<DesignCodeCol>4</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
@@ -766,7 +806,7 @@ end</Script>
 <FileVer1>7</FileVer1>
 <FileVer2>0</FileVer2>
 <FileVer3>0</FileVer3>
-<FileVer4>0</FileVer4>
+<FileVer4>5</FileVer4>
 <ProductVer1>2</ProductVer1>
 <ProductVer2>0</ProductVer2>
 <ProductVer3>0</ProductVer3>
@@ -861,14 +901,15 @@ end</Script>
 <Name>On Preload</Name>
 <Args/>
 <Script>Window.SetSize(Application.GetWndHandle(), 600, 480);
-Window.SetText(Application.GetWndHandle(), ServerName);</Script>
+Window.SetText(Application.GetWndHandle(), ServerName);
+Window.SetPos(Application.GetWndHandle(), System.GetDisplayInfo().Width / 2- Window.GetSize(Application.GetWndHandle()).Width / 2, System.GetDisplayInfo().Height / 2 - Window.GetSize(Application.GetWndHandle()).Height / 2);</Script>
 <TreeStates>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
 <DesignCodeLine>0</DesignCodeLine>
-<DesignCodeCol>50</DesignCodeCol>
+<DesignCodeCol>53</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
@@ -1111,6 +1152,309 @@ LoadInfo();</Script>
 <BookMarks count="0">
 </BookMarks>
 </Event>
+<Object>
+<Type>40</Type>
+<Name>Plugin1</Name>
+<VisibleAtDesignTime>1</VisibleAtDesignTime>
+<VisibleAtRunTime>1</VisibleAtRunTime>
+<Locked>1</Locked>
+<Enabled>0</Enabled>
+<ToolTip/>
+<Cursor>0</Cursor>
+<Group>8</Group>
+<MaintainAspectRatio>0</MaintainAspectRatio>
+<Pin>0</Pin>
+<TabIndex>-1</TabIndex>
+<AutoResize>0</AutoResize>
+<Coordinates>
+<Top>100</Top>
+<Bottom>391</Bottom>
+<Left>380</Left>
+<Right>591</Right>
+</Coordinates>
+<Ratios>
+<WidthRatio>-1.000000</WidthRatio>
+<HeightRatio>-1.000000</HeightRatio>
+</Ratios>
+<Event>
+<Name>On Enter</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>658750</DesignCodeLine>
+<DesignCodeCol>1080623114</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Leave</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>658688</DesignCodeLine>
+<DesignCodeCol>10</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Click</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>3158064</DesignCodeLine>
+<DesignCodeCol>258848128</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On RightClick</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>222193004</DesignCodeLine>
+<DesignCodeCol>3538954</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Actions/>
+<PLUGIN>
+<DLLFile>ShapeEx\ShapeEx.apo</DLLFile>
+<CustomData>0,8026746,1,-1,30,30,110,30,20,2,0,0,0</CustomData>
+</PLUGIN>
+<MouseOverSndMode>0</MouseOverSndMode>
+<MouseOverSound/>
+<MouseClickSndMode>0</MouseClickSndMode>
+<MouseClickSound/>
+</Object>
+<Object>
+<Type>2</Type>
+<Name>Paragraph4</Name>
+<VisibleAtDesignTime>1</VisibleAtDesignTime>
+<VisibleAtRunTime>1</VisibleAtRunTime>
+<Locked>1</Locked>
+<Enabled>0</Enabled>
+<ToolTip/>
+<Cursor>0</Cursor>
+<Group>8</Group>
+<MaintainAspectRatio>0</MaintainAspectRatio>
+<Pin>0</Pin>
+<TabIndex>-1</TabIndex>
+<AutoResize>0</AutoResize>
+<Coordinates>
+<Top>90</Top>
+<Bottom>113</Bottom>
+<Left>390</Left>
+<Right>494</Right>
+</Coordinates>
+<Ratios>
+<WidthRatio>-1.000000</WidthRatio>
+<HeightRatio>-1.000000</HeightRatio>
+</Ratios>
+<Event>
+<Name>On Click</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>20803</DesignCodeLine>
+<DesignCodeCol>486541837</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Right-Click</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>20803</DesignCodeLine>
+<DesignCodeCol>2830382</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Enter</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>20803</DesignCodeLine>
+<DesignCodeCol>1079123968</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Leave</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>20803</DesignCodeLine>
+<DesignCodeCol>54</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Actions>
+<Action>
+<Type>0</Type>
+<Name>None</Name>
+<Exit>0</Exit>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+</Action>
+</Actions>
+<Text>
+<Body>Launcher Settings</Body>
+<NormalColor>0</NormalColor>
+<HighlightColor>0</HighlightColor>
+<MouseDownColor>0</MouseDownColor>
+<DisabledColor>2147483647</DisabledColor>
+<BorderColor>0</BorderColor>
+<BackColor>15790320</BackColor>
+<FontData>
+<FontName>Segoe UI Semibold</FontName>
+<CharacterSet>0</CharacterSet>
+<Height>-12</Height>
+<Weight>600</Weight>
+<Italic>0</Italic>
+<Underline>0</Underline>
+<StrikeOut>0</StrikeOut>
+<AntiAlias>1</AntiAlias>
+</FontData>
+<Alignment>0</Alignment>
+<TransBG>0</TransBG>
+<VSMode>2</VSMode>
+<HSMode>2</HSMode>
+<SBStyle>0</SBStyle>
+<SBSkin/>
+<Border>0</Border>
+<MouseOverSndMode>0</MouseOverSndMode>
+<MouseOverSound/>
+<MouseClickSndMode>0</MouseClickSndMode>
+<MouseClickSound/>
+</Text>
+</Object>
+<Object>
+<Type>40</Type>
+<Name>Plugin3</Name>
+<VisibleAtDesignTime>1</VisibleAtDesignTime>
+<VisibleAtRunTime>1</VisibleAtRunTime>
+<Locked>1</Locked>
+<Enabled>0</Enabled>
+<ToolTip/>
+<Cursor>0</Cursor>
+<Group>0</Group>
+<MaintainAspectRatio>0</MaintainAspectRatio>
+<Pin>0</Pin>
+<TabIndex>-1</TabIndex>
+<AutoResize>0</AutoResize>
+<Coordinates>
+<Top>396</Top>
+<Bottom>421</Bottom>
+<Left>10</Left>
+<Right>371</Right>
+</Coordinates>
+<Ratios>
+<WidthRatio>-1.000000</WidthRatio>
+<HeightRatio>-1.000000</HeightRatio>
+</Ratios>
+<Event>
+<Name>On Enter</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>658750</DesignCodeLine>
+<DesignCodeCol>1080623114</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Leave</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>658688</DesignCodeLine>
+<DesignCodeCol>10</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On Click</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>3158064</DesignCodeLine>
+<DesignCodeCol>258848128</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Event>
+<Name>On RightClick</Name>
+<Args/>
+<Script/>
+<TreeStates>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+<TreeState>0</TreeState>
+</TreeStates>
+<DesignCodeLine>222193004</DesignCodeLine>
+<DesignCodeCol>3538954</DesignCodeCol>
+<BookMarks count="0">
+</BookMarks>
+</Event>
+<Actions/>
+<PLUGIN>
+<DLLFile>ShapeEx\ShapeEx.apo</DLLFile>
+<CustomData>0,8026746,1,-1,30,30,110,30,20,2,0,0,0</CustomData>
+</PLUGIN>
+<MouseOverSndMode>0</MouseOverSndMode>
+<MouseOverSound/>
+<MouseClickSndMode>0</MouseClickSndMode>
+<MouseClickSound/>
+</Object>
 <Object>
 <Type>11</Type>
 <Name>Progress</Name>
@@ -2049,309 +2393,6 @@ LoadInfo();</Script>
 </Text>
 </Object>
 <Object>
-<Type>40</Type>
-<Name>Plugin4</Name>
-<VisibleAtDesignTime>1</VisibleAtDesignTime>
-<VisibleAtRunTime>1</VisibleAtRunTime>
-<Locked>1</Locked>
-<Enabled>0</Enabled>
-<ToolTip/>
-<Cursor>0</Cursor>
-<Group>2</Group>
-<MaintainAspectRatio>0</MaintainAspectRatio>
-<Pin>0</Pin>
-<TabIndex>-1</TabIndex>
-<AutoResize>0</AutoResize>
-<Coordinates>
-<Top>104</Top>
-<Bottom>391</Bottom>
-<Left>380</Left>
-<Right>591</Right>
-</Coordinates>
-<Ratios>
-<WidthRatio>-1.000000</WidthRatio>
-<HeightRatio>-1.000000</HeightRatio>
-</Ratios>
-<Event>
-<Name>On Enter</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>658750</DesignCodeLine>
-<DesignCodeCol>1080623114</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Leave</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>658688</DesignCodeLine>
-<DesignCodeCol>10</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Click</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>3158064</DesignCodeLine>
-<DesignCodeCol>258848128</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On RightClick</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>222193004</DesignCodeLine>
-<DesignCodeCol>3538954</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Actions/>
-<PLUGIN>
-<DLLFile>ShapeEx\ShapeEx.apo</DLLFile>
-<CustomData>0,8026746,1,-1,30,30,110,30,20,2,0,0,0</CustomData>
-</PLUGIN>
-<MouseOverSndMode>0</MouseOverSndMode>
-<MouseOverSound/>
-<MouseClickSndMode>0</MouseClickSndMode>
-<MouseClickSound/>
-</Object>
-<Object>
-<Type>2</Type>
-<Name>Paragraph4</Name>
-<VisibleAtDesignTime>1</VisibleAtDesignTime>
-<VisibleAtRunTime>1</VisibleAtRunTime>
-<Locked>1</Locked>
-<Enabled>0</Enabled>
-<ToolTip/>
-<Cursor>0</Cursor>
-<Group>2</Group>
-<MaintainAspectRatio>0</MaintainAspectRatio>
-<Pin>0</Pin>
-<TabIndex>-1</TabIndex>
-<AutoResize>0</AutoResize>
-<Coordinates>
-<Top>93</Top>
-<Bottom>121</Bottom>
-<Left>390</Left>
-<Right>493</Right>
-</Coordinates>
-<Ratios>
-<WidthRatio>-1.000000</WidthRatio>
-<HeightRatio>-1.000000</HeightRatio>
-</Ratios>
-<Event>
-<Name>On Click</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>20803</DesignCodeLine>
-<DesignCodeCol>486541837</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Right-Click</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>20803</DesignCodeLine>
-<DesignCodeCol>2830382</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Enter</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>20803</DesignCodeLine>
-<DesignCodeCol>1079123968</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Leave</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>20803</DesignCodeLine>
-<DesignCodeCol>54</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Actions>
-<Action>
-<Type>0</Type>
-<Name>None</Name>
-<Exit>0</Exit>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-</Action>
-</Actions>
-<Text>
-<Body>Launcher Settings</Body>
-<NormalColor>0</NormalColor>
-<HighlightColor>0</HighlightColor>
-<MouseDownColor>0</MouseDownColor>
-<DisabledColor>2147483647</DisabledColor>
-<BorderColor>0</BorderColor>
-<BackColor>15790320</BackColor>
-<FontData>
-<FontName>Segoe UI Semibold</FontName>
-<CharacterSet>0</CharacterSet>
-<Height>-12</Height>
-<Weight>600</Weight>
-<Italic>0</Italic>
-<Underline>0</Underline>
-<StrikeOut>0</StrikeOut>
-<AntiAlias>1</AntiAlias>
-</FontData>
-<Alignment>0</Alignment>
-<TransBG>0</TransBG>
-<VSMode>2</VSMode>
-<HSMode>2</HSMode>
-<SBStyle>0</SBStyle>
-<SBSkin/>
-<Border>0</Border>
-<MouseOverSndMode>0</MouseOverSndMode>
-<MouseOverSound/>
-<MouseClickSndMode>0</MouseClickSndMode>
-<MouseClickSound/>
-</Text>
-</Object>
-<Object>
-<Type>40</Type>
-<Name>Plugin3</Name>
-<VisibleAtDesignTime>1</VisibleAtDesignTime>
-<VisibleAtRunTime>1</VisibleAtRunTime>
-<Locked>0</Locked>
-<Enabled>0</Enabled>
-<ToolTip/>
-<Cursor>0</Cursor>
-<Group>6</Group>
-<MaintainAspectRatio>0</MaintainAspectRatio>
-<Pin>0</Pin>
-<TabIndex>-1</TabIndex>
-<AutoResize>0</AutoResize>
-<Coordinates>
-<Top>396</Top>
-<Bottom>421</Bottom>
-<Left>10</Left>
-<Right>371</Right>
-</Coordinates>
-<Ratios>
-<WidthRatio>-1.000000</WidthRatio>
-<HeightRatio>-1.000000</HeightRatio>
-</Ratios>
-<Event>
-<Name>On Enter</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>658750</DesignCodeLine>
-<DesignCodeCol>1080623114</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Leave</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>658688</DesignCodeLine>
-<DesignCodeCol>10</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On Click</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>3158064</DesignCodeLine>
-<DesignCodeCol>258848128</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Event>
-<Name>On RightClick</Name>
-<Args/>
-<Script/>
-<TreeStates>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-<TreeState>0</TreeState>
-</TreeStates>
-<DesignCodeLine>222193004</DesignCodeLine>
-<DesignCodeCol>3538954</DesignCodeCol>
-<BookMarks count="0">
-</BookMarks>
-</Event>
-<Actions/>
-<PLUGIN>
-<DLLFile>ShapeEx\ShapeEx.apo</DLLFile>
-<CustomData>0,8026746,1,-1,30,30,110,30,20,2,0,0,0</CustomData>
-</PLUGIN>
-<MouseOverSndMode>0</MouseOverSndMode>
-<MouseOverSound/>
-<MouseClickSndMode>0</MouseClickSndMode>
-<MouseClickSound/>
-</Object>
-<Object>
 <Type>2</Type>
 <Name>Paragraph5</Name>
 <VisibleAtDesignTime>1</VisibleAtDesignTime>
@@ -2483,7 +2524,7 @@ LoadInfo();</Script>
 <Enabled>0</Enabled>
 <ToolTip/>
 <Cursor>0</Cursor>
-<Group>6</Group>
+<Group>0</Group>
 <MaintainAspectRatio>0</MaintainAspectRatio>
 <Pin>0</Pin>
 <TabIndex>-1</TabIndex>
@@ -2606,7 +2647,7 @@ LoadInfo();</Script>
 <Enabled>0</Enabled>
 <ToolTip/>
 <Cursor>0</Cursor>
-<Group>6</Group>
+<Group>0</Group>
 <MaintainAspectRatio>0</MaintainAspectRatio>
 <Pin>0</Pin>
 <TabIndex>-1</TabIndex>
@@ -2728,7 +2769,7 @@ LoadInfo();</Script>
 <Locked>0</Locked>
 <Enabled>1</Enabled>
 <ToolTip>Do not touch the configuration during the download, in any case pause it and make the modifications you want, I do not want to write more code: #</ToolTip>
-<Cursor>0</Cursor>
+<Cursor>1</Cursor>
 <Group>0</Group>
 <MaintainAspectRatio>0</MaintainAspectRatio>
 <Pin>0</Pin>
@@ -3004,7 +3045,7 @@ end</Script>
 <Locked>0</Locked>
 <Enabled>1</Enabled>
 <ToolTip>It also serves to do a Refresh</ToolTip>
-<Cursor>0</Cursor>
+<Cursor>1</Cursor>
 <Group>0</Group>
 <MaintainAspectRatio>0</MaintainAspectRatio>
 <Pin>0</Pin>
@@ -3284,7 +3325,7 @@ LoadInfo();</Script>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
-<DesignCodeLine>658750</DesignCodeLine>
+<DesignCodeLine>0</DesignCodeLine>
 <DesignCodeCol>0</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
@@ -3299,7 +3340,7 @@ LoadInfo();</Script>
 <TreeState>0</TreeState>
 </TreeStates>
 <DesignCodeLine>0</DesignCodeLine>
-<DesignCodeCol>101</DesignCodeCol>
+<DesignCodeCol>0</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
@@ -3312,8 +3353,8 @@ LoadInfo();</Script>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
-<DesignCodeLine>1046834292</DesignCodeLine>
-<DesignCodeCol>1073744397</DesignCodeCol>
+<DesignCodeLine>0</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
@@ -3777,7 +3818,7 @@ LoadInfo();</Script>
 <Locked>0</Locked>
 <Enabled>1</Enabled>
 <ToolTip/>
-<Cursor>0</Cursor>
+<Cursor>1</Cursor>
 <Group>0</Group>
 <MaintainAspectRatio>0</MaintainAspectRatio>
 <Pin>0</Pin>
@@ -4006,7 +4047,7 @@ LoadInfo();</Script>
 <Locked>0</Locked>
 <Enabled>1</Enabled>
 <ToolTip>It also serves to do a Refresh</ToolTip>
-<Cursor>0</Cursor>
+<Cursor>1</Cursor>
 <Group>0</Group>
 <MaintainAspectRatio>0</MaintainAspectRatio>
 <Pin>0</Pin>
@@ -4347,7 +4388,13 @@ LoadInfo();</Script>
 <ReadOrder>0</ReadOrder>
 <CheckList>0</CheckList>
 </Window>
-<ListBoxItems/>
+<ListBoxItems>
+<ListItem>
+<Text>Fix read line 271 (Global Functions)</Text>
+<Data/>
+<Check>0</Check>
+</ListItem>
+</ListBoxItems>
 </Object>
 <HGuidelines/>
 <VGuidelines/>
@@ -4374,14 +4421,15 @@ LoadInfo();</Script>
 <Name>On Preload</Name>
 <Args/>
 <Script>Window.SetSize(Application.GetWndHandle(), 701, 429);
-Window.SetText(Application.GetWndHandle(), ServerName);</Script>
+Window.SetText(Application.GetWndHandle(), ServerName);
+Window.SetPos(Application.GetWndHandle(), System.GetDisplayInfo().Width / 2- Window.GetSize(Application.GetWndHandle()).Width / 2, System.GetDisplayInfo().Height / 2 - Window.GetSize(Application.GetWndHandle()).Height / 2);</Script>
 <TreeStates>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
-<DesignCodeLine>1</DesignCodeLine>
-<DesignCodeCol>55</DesignCodeCol>
+<DesignCodeLine>2</DesignCodeLine>
+<DesignCodeCol>223</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
@@ -4397,7 +4445,7 @@ CheckUpdate();</Script>
 <TreeState>0</TreeState>
 </TreeStates>
 <DesignCodeLine>0</DesignCodeLine>
-<DesignCodeCol>42</DesignCodeCol>
+<DesignCodeCol>0</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
@@ -5252,14 +5300,14 @@ end</Script>
 <Event>
 <Name>OnPreload</Name>
 <Args/>
-<Script>WKE.LoadURL("Web", "https://html5test.com/");</Script>
+<Script>--WKE.LoadURL("Web", "https://html5test.com/");</Script>
 <TreeStates>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
 <DesignCodeLine>0</DesignCodeLine>
-<DesignCodeCol>16</DesignCodeCol>
+<DesignCodeCol>2</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
@@ -5308,7 +5356,19 @@ end</Script>
 <Event>
 <Name>OnURLChanged</Name>
 <Args>string e_Url</Args>
-<Script/>
+<Script>local Url = WKE.GetURL("Web");
+
+local DiscordInvite = String.Find(Url, "#discord_join=", 1, true);
+if(DiscordInvite ~= -1)then
+	local InviteID = string.sub(Url, DiscordInvite+14, String.Length(Url));
+	Shell.Execute("discord:///invite/"..InviteID, "open", "", "", SW_SHOWNORMAL, false);
+end
+
+local OpenURL = String.Find(Url, "#open=", 1, true);
+if(OpenURL ~= -1)then
+	local getURL = string.sub(Url, OpenURL+6, String.Length(Url));
+	Shell.Execute(getURL, "open", "", "", SW_SHOWNORMAL, false);
+end</Script>
 <TreeStates>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
@@ -5392,7 +5452,7 @@ end</Script>
 <Actions/>
 <PLUGIN>
 <DLLFile>MiniBlink\MiniBlink.apo</DLLFile>
-<CustomData>les(x86)=C:\Program Files (x86)\Common Files</CustomData>
+<CustomData>i</CustomData>
 </PLUGIN>
 <MouseOverSndMode>0</MouseOverSndMode>
 <MouseOverSound/>
@@ -5425,7 +5485,7 @@ end</Script>
 <Args/>
 <Script>Window.SetSize(Application.GetWndHandle(), 734, 670);
 Window.SetText(Application.GetWndHandle(), ServerName);
-Window.SetPos(Application.GetWndHandle(), Window.GetPos(Application.GetWndHandle()).X, System.GetDisplayInfo().Height / 2 - Window.GetSize(Application.GetWndHandle()).Height / 2);
+Window.SetPos(Application.GetWndHandle(), System.GetDisplayInfo().Width / 2- Window.GetSize(Application.GetWndHandle()).Width / 2, System.GetDisplayInfo().Height / 2 - Window.GetSize(Application.GetWndHandle()).Height / 2);
 
 Transparency();</Script>
 <TreeStates>
@@ -5433,8 +5493,8 @@ Transparency();</Script>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
-<DesignCodeLine>4</DesignCodeLine>
-<DesignCodeCol>13</DesignCodeCol>
+<DesignCodeLine>3</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
@@ -6181,14 +6241,14 @@ end</Script>
 <Event>
 <Name>OnPreload</Name>
 <Args/>
-<Script>WKE.LoadURL("Web", "https://html5test.com/");</Script>
+<Script>--WKE.LoadURL("Web", "https://html5test.com/");</Script>
 <TreeStates>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
 <DesignCodeLine>0</DesignCodeLine>
-<DesignCodeCol>16</DesignCodeCol>
+<DesignCodeCol>2</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
@@ -6237,14 +6297,26 @@ end</Script>
 <Event>
 <Name>OnURLChanged</Name>
 <Args>string e_Url</Args>
-<Script/>
+<Script>local Url = WKE.GetURL("Web");
+
+local DiscordInvite = String.Find(Url, "#discord_join=", 1, true);
+if(DiscordInvite ~= -1)then
+	local InviteID = string.sub(Url, DiscordInvite+14, String.Length(Url));
+	Shell.Execute("discord:///invite/"..InviteID, "open", "", "", SW_SHOWNORMAL, false);
+end
+
+local OpenURL = String.Find(Url, "#open=", 1, true);
+if(OpenURL ~= -1)then
+	local getURL = string.sub(Url, OpenURL+6, String.Length(Url));
+	Shell.Execute(getURL, "open", "", "", SW_SHOWNORMAL, false);
+end</Script>
 <TreeStates>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
-<DesignCodeLine>0</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
+<DesignCodeLine>12</DesignCodeLine>
+<DesignCodeCol>3</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
@@ -6321,7 +6393,7 @@ end</Script>
 <Actions/>
 <PLUGIN>
 <DLLFile>MiniBlink\MiniBlink.apo</DLLFile>
-<CustomData>‰7Ý‰7Ý‰7Ý‰7Ý‰7Ý‰7Ý‰7Ý‰7Ý‰7Ý‰7Ý‰7Ý‰7Ý‰7Ý‰7Ý‰7Ý‰7Ý‰7Ý‰7Ý‰7Ý‰7Ý‰7Ý‰7Ý‰7Ý‰7Ý‰7Ý‰7Ý‰7Ý‰7Ý‰7Ý‰7Ý‰7~C	~C	}C	ƒH···ÛÛÛעעע‏‏‏‏‏‏עעעÛÛÛ···¾jֲv+ֲv+ֳv+Ý‰7Þ8Þ8Þ‹9Þ‹9Þ‹:ß:ß;ß;ß;ß;ß;א;א;א;א;א;א;א;א;א;א;א;א;א;א;תָ`ÿÿÿÿÿÿÿÿÿץÿÿא‚א;ו;ÿם₪ÿÿÿוָבא;א;א;א;א;א;א;א;א;א;א;א;א;א;א;א;א;א;א;א;א;א;א;א;א;א;א;א;א;א;א;א;א;א;א;א;ÿÛ‚ÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿא´ֳא;א;א;א;א;א;א;א;א;א;א;א;א;א;א;א;א;א;א;א;א;א;א;א;א;א;א;א;א;א;א;€D	D	~C	…I···ÛÛÛעעע‏‏‏‏‏‏עעעÛÛÛ···ֳlֶz/ַ{0ַ{0א&lt;א&lt;א=ב=ב&gt;ב&gt;ב&gt;ג?ג?ג?ג?ג?ג?ג?ד‘@ג?ג?ג?ג?ג?ג?ג?ג?ג?ג?ג?ג?ג?ג?ג?ג?ג?ג?ח?ÿם¦ÿÿÿחֹבג?ג?ג?ג?ג?ג?ג?ג?ג?ג?ג?ג?ג?ג?ג?ג?ג?ג?ג?ג?ג?ג?ג?ג?ג?ג?ג?ג?ג?ג?ג?ג?ג?ג?ג?ג?ג?ג?ג?ג?ג?ג?ג?ד‘@ד‘@ד‘@ד‘@ד‘@ד‘@ד‘@ד‘@ד‘@ד‘@ד‘@ד‘@ד‘@ד‘@ד‘@ד‘@ד‘@ד‘@ד‘@ד‘@ד‘@ד‘@ד‘@ד‘@ד‘@ד‘@ד‘@ד‘@ד‘@ד‘@ד‘@ד‘@‚E	E	€D	ˆK···ÛÛÛעעע‏‏‏‏‏‏עעעÛÛÛ···ָoֻ~3ֻ~3ֻ4ד‘@ד‘@ד‘Aד‘Aה’Bה“Cה“Cה“Cו“Cו“Cו“Cו”Dו”Dו”Dו”Dו”Dו”Dו”Dו”Dו”Dו”Dו”Dו”Dו”Dו”Dו”Dו”Dו”Dו”Dו”Dו”</CustomData>
+<CustomData/>
 </PLUGIN>
 <MouseOverSndMode>0</MouseOverSndMode>
 <MouseOverSound/>
@@ -6353,14 +6425,15 @@ end</Script>
 <Name>On Preload</Name>
 <Args/>
 <Script>Window.SetSize(Application.GetWndHandle(), 750, 550);
-Window.SetText(Application.GetWndHandle(), ServerName);</Script>
+Window.SetText(Application.GetWndHandle(), ServerName);
+Window.SetPos(Application.GetWndHandle(), System.GetDisplayInfo().Width / 2- Window.GetSize(Application.GetWndHandle()).Width / 2, System.GetDisplayInfo().Height / 2 - Window.GetSize(Application.GetWndHandle()).Height / 2);</Script>
 <TreeStates>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
-<DesignCodeLine>1</DesignCodeLine>
-<DesignCodeCol>55</DesignCodeCol>
+<DesignCodeLine>2</DesignCodeLine>
+<DesignCodeCol>223</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
@@ -6375,8 +6448,8 @@ CheckUpdate();</Script>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
-<DesignCodeLine>0</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
+<DesignCodeLine>2</DesignCodeLine>
+<DesignCodeCol>1</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
@@ -6525,8 +6598,8 @@ end</Script>
 <Coordinates>
 <Top>494</Top>
 <Bottom>514</Bottom>
-<Left>38</Left>
-<Right>400</Right>
+<Left>37</Left>
+<Right>411</Right>
 </Coordinates>
 <Ratios>
 <WidthRatio>-1.000000</WidthRatio>
@@ -6600,9 +6673,9 @@ end</Script>
 <AutoResize>0</AutoResize>
 <Coordinates>
 <Top>486</Top>
-<Bottom>525</Bottom>
-<Left>424</Left>
-<Right>572</Right>
+<Bottom>523</Bottom>
+<Left>429</Left>
+<Right>575</Right>
 </Coordinates>
 <Ratios>
 <WidthRatio>-1.000000</WidthRatio>
@@ -6729,9 +6802,9 @@ end</Script>
 <AutoResize>0</AutoResize>
 <Coordinates>
 <Top>486</Top>
-<Bottom>525</Bottom>
-<Left>579</Left>
-<Right>727</Right>
+<Bottom>523</Bottom>
+<Left>580</Left>
+<Right>726</Right>
 </Coordinates>
 <Ratios>
 <WidthRatio>-1.000000</WidthRatio>
@@ -6984,14 +7057,14 @@ end</Script>
 <Event>
 <Name>OnPreload</Name>
 <Args/>
-<Script>WKE.LoadURL("Web", "https://html5test.com/");</Script>
+<Script>--WKE.LoadURL("Web", "https://html5test.com/");</Script>
 <TreeStates>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
 <DesignCodeLine>0</DesignCodeLine>
-<DesignCodeCol>16</DesignCodeCol>
+<DesignCodeCol>2</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
@@ -7040,14 +7113,26 @@ end</Script>
 <Event>
 <Name>OnURLChanged</Name>
 <Args>string e_Url</Args>
-<Script/>
+<Script>local Url = WKE.GetURL("Web");
+
+local DiscordInvite = String.Find(Url, "#discord_join=", 1, true);
+if(DiscordInvite ~= -1)then
+	local InviteID = string.sub(Url, DiscordInvite+14, String.Length(Url));
+	Shell.Execute("discord:///invite/"..InviteID, "open", "", "", SW_SHOWNORMAL, false);
+end
+
+local OpenURL = String.Find(Url, "#open=", 1, true);
+if(OpenURL ~= -1)then
+	local getURL = string.sub(Url, OpenURL+6, String.Length(Url));
+	Shell.Execute(getURL, "open", "", "", SW_SHOWNORMAL, false);
+end</Script>
 <TreeStates>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
-<DesignCodeLine>0</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
+<DesignCodeLine>12</DesignCodeLine>
+<DesignCodeCol>3</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
@@ -7124,7 +7209,7 @@ end</Script>
 <Actions/>
 <PLUGIN>
 <DLLFile>MiniBlink\MiniBlink.apo</DLLFile>
-<CustomData>²²םםםףףףףףףףףףףףףףףףףףףףףףףףףףףףכככִִִחחחכככככככככךךךךךךיייייייייטטטטטטחחחחחחחחחזזזזזזזזזווווווההההההßßß÷÷÷”””¢¢¢ÚÚÚףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףצצצצצצצצצצצצ···ÛÛÛעעע‏‏‏‏‏‏עעעÛÛÛ···צצצצצצצצצצצצףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףחחח¾¾¾ÝÝÝ‏‏‏‏‏‏‎‎‎‎‎‎‎‎‎üüüüüüüüüûûûûûûתתתתתתששששששררררררקקקקקקײײײ­­­ßßßעעעףףףףףףףףףףףףףףףףףףףףףףףףעעעאאא²²²´´´ממממממםםםםםםלללללללללכככככככככךךךךךךיייייייייטטטטטטחחחחחחחחחַַַ¦¦¦ױױױסססףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףףצצצצצצצצצצצצ···ÛÛÛעעע‏‏‏‏‏‏עעעÛÛÛ···צצצצצצצצצצצצפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפעעעÛÛÛֲֲֲטטטÿÿÿÿÿÿÿÿÿÿÿÿ‏‏‏‏‏‏‏‏‏‎‎‎‎‎‎‎‎‎üüüüüüûûûûûûûûûתתתללל±±±ּּּעעעפפפפפפפפפפפפפפפפפפפפפפפפפפפללל־־־¦¦¦ÞÞÞננננננןןןןןןןןןמממממממממםםםםםםלללללללללכככככככככךךךךךךֻֻֻ¢¢¢©©©׳׳׳עעעפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפצצצצצצצצצצצצ···ÛÛÛעעע‏‏‏‏‏‏עעעÛÛÛ···צצצצצצצצ</CustomData>
+<CustomData>דדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדטטטטטטטטטטטט···ÛÛÛעעע‏‏‏‏‏‏עעעÛÛÛ···טטטטטטטטטטטטדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדÚÚÚ¼¼¼{{{¼¼¼׃׃׃ׁׁׁׁׁׁׂׂׂׂׂׂׂׂׂ׀׀׀׀׀׀ֿֿֿֿֿֿ־־־־־־ּּּּּּֽֽֽֽֽֽ   pppָָָבבבדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדדטטטטטטטטטטטט···ÛÛÛעעע‏‏‏‏‏‏עעעÛÛÛ···טטטטטטטטטטטטהההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההדדד׀׀׀™™™ˆˆˆײײײױױױױױױװװװװװװװװװ׃׃׃׃׃׃ׁׁׁׁׁׁׂׂׂׂׂׂ׀׀׀׀׀׀׀׀׀ֿֿֿֿֿֿ¶¶¶nnn»»»ÞÞÞההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההיייייייייייי···ÛÛÛעעע‏‏‏‏‏‏עעעÛÛÛ···ייייייייייייהההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההההה</CustomData>
 </PLUGIN>
 <MouseOverSndMode>0</MouseOverSndMode>
 <MouseOverSound/>
@@ -7157,7 +7242,7 @@ end</Script>
 <Args/>
 <Script>Window.SetSize(Application.GetWndHandle(), 710, 745);
 Window.SetText(Application.GetWndHandle(), ServerName);
-Window.SetPos(Application.GetWndHandle(), Window.GetPos(Application.GetWndHandle()).X, System.GetDisplayInfo().Height / 2 - Window.GetSize(Application.GetWndHandle()).Height / 2);
+Window.SetPos(Application.GetWndHandle(), System.GetDisplayInfo().Width / 2- Window.GetSize(Application.GetWndHandle()).Width / 2, System.GetDisplayInfo().Height / 2 - Window.GetSize(Application.GetWndHandle()).Height / 2);
 
 Transparency();</Script>
 <TreeStates>
@@ -7165,8 +7250,8 @@ Transparency();</Script>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
-<DesignCodeLine>4</DesignCodeLine>
-<DesignCodeCol>13</DesignCodeCol>
+<DesignCodeLine>3</DesignCodeLine>
+<DesignCodeCol>0</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
@@ -7182,7 +7267,7 @@ CheckUpdate();</Script>
 <TreeState>0</TreeState>
 </TreeStates>
 <DesignCodeLine>0</DesignCodeLine>
-<DesignCodeCol>34</DesignCodeCol>
+<DesignCodeCol>0</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
@@ -7319,7 +7404,7 @@ end</Script>
 <Name>Status</Name>
 <VisibleAtDesignTime>1</VisibleAtDesignTime>
 <VisibleAtRunTime>1</VisibleAtRunTime>
-<Locked>0</Locked>
+<Locked>1</Locked>
 <Enabled>0</Enabled>
 <ToolTip/>
 <Cursor>0</Cursor>
@@ -7329,9 +7414,9 @@ end</Script>
 <TabIndex>-1</TabIndex>
 <AutoResize>0</AutoResize>
 <Coordinates>
-<Top>680</Top>
-<Bottom>709</Bottom>
-<Left>38</Left>
+<Top>681</Top>
+<Bottom>710</Bottom>
+<Left>37</Left>
 <Right>488</Right>
 </Coordinates>
 <Ratios>
@@ -7942,14 +8027,14 @@ end</Script>
 <Event>
 <Name>OnPreload</Name>
 <Args/>
-<Script>WKE.LoadURL("Web", "https://html5test.com/");</Script>
+<Script>--WKE.LoadURL("Web", "https://html5test.com/");</Script>
 <TreeStates>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
 <DesignCodeLine>0</DesignCodeLine>
-<DesignCodeCol>16</DesignCodeCol>
+<DesignCodeCol>2</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
@@ -7998,14 +8083,26 @@ end</Script>
 <Event>
 <Name>OnURLChanged</Name>
 <Args>string e_Url</Args>
-<Script/>
+<Script>local Url = WKE.GetURL("Web");
+
+local DiscordInvite = String.Find(Url, "#discord_join=", 1, true);
+if(DiscordInvite ~= -1)then
+	local InviteID = string.sub(Url, DiscordInvite+14, String.Length(Url));
+	Shell.Execute("discord:///invite/"..InviteID, "open", "", "", SW_SHOWNORMAL, false);
+end
+
+local OpenURL = String.Find(Url, "#open=", 1, true);
+if(OpenURL ~= -1)then
+	local getURL = string.sub(Url, OpenURL+6, String.Length(Url));
+	Shell.Execute(getURL, "open", "", "", SW_SHOWNORMAL, false);
+end</Script>
 <TreeStates>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 <TreeState>0</TreeState>
 </TreeStates>
-<DesignCodeLine>0</DesignCodeLine>
-<DesignCodeCol>0</DesignCodeCol>
+<DesignCodeLine>12</DesignCodeLine>
+<DesignCodeCol>3</DesignCodeCol>
 <BookMarks count="0">
 </BookMarks>
 </Event>
@@ -8082,7 +8179,7 @@ end</Script>
 <Actions/>
 <PLUGIN>
 <DLLFile>MiniBlink\MiniBlink.apo</DLLFile>
-<CustomData>פפפפפפפפפפףףףבבבµµµ»»»ףףףעעעעעעעעעסססססססססננננננןןןןןןןןןמממממממממםםםםםם׃׃׃¦¦¦₪₪₪ֽֽֽעעעפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפפצצצצצצצצצצצצ···ÛÛÛעעע‏‏‏‏‏‏עעעÛÛÛ···קקקקקקקקקקקקץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץףףףÜÜÜָָָÙÙÙרררÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿûûûײײײ¼¼¼׀׀׀עעעץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץםםםֿֿֿ«««דדדץץץץץץפפפפפפפפפףףףףףףעעעעעעעעעסססססססססננננננוווµµµ¨¨¨ֿֿֿףףףץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץקקקקקקקקקקקק···ÛÛÛעעע‏‏‏‏‏‏עעעÛÛÛ···קקקקקקקקקקקקץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץפפפחחחָָָֿֿֿÝÝÝמממÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿפפפÞÞÞֵֵֵַַַגגגףףףץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץפפפגגג···ֲֲֲרררקקקקקקקקקצצצצצצץץץץץץץץץפפפפפפפפפףףףףףףעעעעעעׁׁׁ³³³כככץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץץקקקקקקקקקקקק···ÛÛÛעעע‏‏‏‏‏‏עעעÛÛÛ···קקקקקקקקקקקקץץץץץץץץץץץץ</CustomData>
+<CustomData>ההההההההההההההההההההההההההההההההההההיייייייייייי···ÛÛÛעעע‏‏‏‏‏‏עעעÛÛÛ···ייייייייייייווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווההה׃׃׃£££ÛÛÛÛÛÛÚÚÚÚÚÚÙÙÙÙÙÙ״״״״״״׳׳׳׳׳׳׳׳׳ײײײײײײױױױױױױױױױװװװװװװ׃׃׃ױױױוווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווויייייייייייי···ÛÛÛעעע‏‏‏‏‏‏עעעÛÛÛ···ייייייייייייוווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווואאאֵֵֵ¹¹¹ÞÞÞÝÝÝÝÝÝÜÜÜÜÜÜÜÜÜÛÛÛÛÛÛÚÚÚÚÚÚÙÙÙÙÙÙ״״״״״״׳׳׳׳׳׳ײײײײײײײײײ¢¢¢„„„ֿֿֿוווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווווויייייייייייי···ÛÛÛעעע‏‏‏‏‏‏עעעÛÛÛ···ךךךךךךךךךךךךזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזזז׳׳׳¬¬¬”””Ü</CustomData>
 </PLUGIN>
 <MouseOverSndMode>0</MouseOverSndMode>
 <MouseOverSound/>
